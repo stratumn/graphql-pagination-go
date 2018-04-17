@@ -15,9 +15,9 @@ type PageInfo struct {
 	HasNextPage     bool       `json:"hasNextPage"`
 }
 
-// List is a list of elements with meta information about the content
+// List contains items with meta information about the content
 type List struct {
-	Elements   []interface{} `json:"elements"`
+	Items      []interface{} `json:"items"`
 	PageInfo   PageInfo      `json:"pageInfo"`
 	TotalCount int           `json:"totalCount`
 }
@@ -25,7 +25,7 @@ type List struct {
 // NewList is a list constructor
 func NewList() *List {
 	return &List{
-		Elements: []interface{}{},
+		Items:    []interface{}{},
 		PageInfo: PageInfo{},
 	}
 }

@@ -81,7 +81,7 @@ func ListDefinitions(config ListConfig) *GraphQLListDefinitions {
 				Type:        graphql.NewNonNull(pageInfoType),
 				Description: "Information to aid in pagination.",
 			},
-			"elements": &graphql.Field{
+			"items": &graphql.Field{
 				Type:        graphql.NewList(config.NodeType),
 				Description: "Information to aid in pagination.",
 			},
