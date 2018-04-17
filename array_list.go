@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const PREFIX = "arrayconnection:"
+const PREFIX = "arraylist:"
 
 type ArraySliceMetaInfo struct {
 	SliceStart  int `json:"sliceStart"`
@@ -17,12 +17,12 @@ type ArraySliceMetaInfo struct {
 }
 
 /*
-A simple function that accepts an array and connection arguments, and returns
-a connection object for use in GraphQL. It uses array offsets as pagination,
+A simple function that accepts an array and list arguments, and returns
+a list object for use in GraphQL. It uses array offsets as pagination,
 so pagination will only work if the array is static.
 */
-func ConnectionFromArray(data []interface{}, args ConnectionArguments) *Connection {
-	return ConnectionFromArraySlice(
+func ListFromArray(data []interface{}, args ListArguments) *List {
+	return ListFromArraySlice(
 		data,
 		args,
 		ArraySliceMetaInfo{
@@ -33,19 +33,19 @@ func ConnectionFromArray(data []interface{}, args ConnectionArguments) *Connecti
 }
 
 /*
-Given a slice (subset) of an array, returns a connection object for use in
+Given a slice (subset) of an array, returns a list object for use in
 GraphQL.
 
-This function is similar to `ConnectionFromArray`, but is intended for use
-cases where you know the cardinality of the connection, consider it too large
+This function is similar to `ListFromArray`, but is intended for use
+cases where you know the cardinality of the list, consider it too large
 to materialize the entire array, and instead wish pass in a slice of the
 total result large enough to cover the range specified in `args`.
 */
-func ConnectionFromArraySlice(
+func ListFromArraySlice(
 	arraySlice []interface{},
-	args ConnectionArguments,
+	args ListArguments,
 	meta ArraySliceMetaInfo,
-) *Connection {
+) *List {
 	sliceEnd := meta.SliceStart + len(arraySlice)
 	beforeOffset := GetOffsetWithDefault(args.Before, meta.ArrayLength)
 	afterOffset := GetOffsetWithDefault(args.After, -1)
@@ -65,7 +65,7 @@ func ConnectionFromArraySlice(
 	end := len(arraySlice) - (sliceEnd - endOffset)
 
 	if begin > end {
-		return NewConnection()
+		return NewList()
 	}
 
 	slice := arraySlice[begin:end]
@@ -78,7 +78,7 @@ func ConnectionFromArraySlice(
 		})
 	}
 
-	var firstEdgeCursor, lastEdgeCursor ConnectionCursor
+	var firstEdgeCursor, lastEdgeCursor ListCursor
 	if len(edges) > 0 {
 		firstEdgeCursor = edges[0].Cursor
 		lastEdgeCursor = edges[len(edges)-1:][0].Cursor
@@ -104,7 +104,7 @@ func ConnectionFromArraySlice(
 		hasNextPage = endOffset < upperBound
 	}
 
-	conn := NewConnection()
+	conn := NewList()
 	conn.Edges = edges
 	conn.PageInfo = PageInfo{
 		StartCursor:     firstEdgeCursor,
@@ -117,13 +117,13 @@ func ConnectionFromArraySlice(
 }
 
 // Creates the cursor string from an offset
-func OffsetToCursor(offset int) ConnectionCursor {
+func OffsetToCursor(offset int) ListCursor {
 	str := fmt.Sprintf("%v%v", PREFIX, offset)
-	return ConnectionCursor(base64.StdEncoding.EncodeToString([]byte(str)))
+	return ListCursor(base64.StdEncoding.EncodeToString([]byte(str)))
 }
 
 // Re-derives the offset from the cursor string.
-func CursorToOffset(cursor ConnectionCursor) (int, error) {
+func CursorToOffset(cursor ListCursor) (int, error) {
 	str := ""
 	b, err := base64.StdEncoding.DecodeString(string(cursor))
 	if err == nil {
@@ -138,7 +138,7 @@ func CursorToOffset(cursor ConnectionCursor) (int, error) {
 }
 
 // Return the cursor associated with an object in an array.
-func CursorForObjectInConnection(data []interface{}, object interface{}) ConnectionCursor {
+func CursorForObjectInList(data []interface{}, object interface{}) ListCursor {
 	offset := -1
 	for i, d := range data {
 		// TODO: better object comparison
@@ -153,7 +153,7 @@ func CursorForObjectInConnection(data []interface{}, object interface{}) Connect
 	return OffsetToCursor(offset)
 }
 
-func GetOffsetWithDefault(cursor ConnectionCursor, defaultOffset int) int {
+func GetOffsetWithDefault(cursor ListCursor, defaultOffset int) int {
 	if cursor == "" {
 		return defaultOffset
 	}

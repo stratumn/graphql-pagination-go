@@ -4,51 +4,54 @@ import (
 	"fmt"
 )
 
-type ConnectionCursor string
+// ListCursor is an opaque index in a list
+type ListCursor string
 
+// PageInfo is the information about the current pagination of the list
 type PageInfo struct {
-	StartCursor     ConnectionCursor `json:"startCursor"`
-	EndCursor       ConnectionCursor `json:"endCursor"`
-	HasPreviousPage bool             `json:"hasPreviousPage"`
-	HasNextPage     bool             `json:"hasNextPage"`
+	StartCursor     ListCursor `json:"startCursor"`
+	EndCursor       ListCursor `json:"endCursor"`
+	HasPreviousPage bool       `json:"hasPreviousPage"`
+	HasNextPage     bool       `json:"hasNextPage"`
 }
 
-type Connection struct {
-	Edges    []*Edge  `json:"edges"`
-	PageInfo PageInfo `json:"pageInfo"`
+// List is a list of elements with meta information about the content
+type List struct {
+	Elements   []interface{} `json:"elements"`
+	PageInfo   PageInfo      `json:"pageInfo"`
+	TotalCount int           `json:"totalCount`
 }
 
-func NewConnection() *Connection {
-	return &Connection{
-		Edges:    []*Edge{},
+// NewList is a list constructor
+func NewList() *List {
+	return &List{
+		Elements: []interface{}{},
 		PageInfo: PageInfo{},
 	}
 }
 
-type Edge struct {
-	Node   interface{}      `json:"node"`
-	Cursor ConnectionCursor `json:"cursor"`
+// ListArguments is pagination query arguments
+// Use NewListArguments() to properly initialize default values
+type ListArguments struct {
+	Before ListCursor `json:"before"`
+	After  ListCursor `json:"after"`
+	First  int        `json:"first"` // -1 for undefined, 0 would return zero results
+	Last   int        `json:"last"`  //  -1 for undefined, 0 would return zero results
 }
 
-// Use NewConnectionArguments() to properly initialize default values
-type ConnectionArguments struct {
-	Before ConnectionCursor `json:"before"`
-	After  ConnectionCursor `json:"after"`
-	First  int              `json:"first"` // -1 for undefined, 0 would return zero results
-	Last   int              `json:"last"`  //  -1 for undefined, 0 would return zero results
-}
-type ConnectionArgumentsConfig struct {
-	Before ConnectionCursor `json:"before"`
-	After  ConnectionCursor `json:"after"`
+// type ListArgumentsConfig struct {
+// 	Before ListCursor `json:"before"`
+// 	After  ListCursor `json:"after"`
 
-	// use pointers for `First` and `Last` fields
-	// so constructor would know when to use default values
-	First *int `json:"first"`
-	Last  *int `json:"last"`
-}
+// 	// use pointers for `First` and `Last` fields
+// 	// so constructor would know when to use default values
+// 	First *int `json:"first"`
+// 	Last  *int `json:"last"`
+// }
 
-func NewConnectionArguments(filters map[string]interface{}) ConnectionArguments {
-	conn := ConnectionArguments{
+// NewListArguments is a list arguments constructor
+func NewListArguments(filters map[string]interface{}) ListArguments {
+	conn := ListArguments{
 		First:  -1,
 		Last:   -1,
 		Before: "",
@@ -66,10 +69,10 @@ func NewConnectionArguments(filters map[string]interface{}) ConnectionArguments 
 			}
 		}
 		if before, ok := filters["before"]; ok {
-			conn.Before = ConnectionCursor(fmt.Sprintf("%v", before))
+			conn.Before = ListCursor(fmt.Sprintf("%v", before))
 		}
 		if after, ok := filters["after"]; ok {
-			conn.After = ConnectionCursor(fmt.Sprintf("%v", after))
+			conn.After = ListCursor(fmt.Sprintf("%v", after))
 		}
 	}
 	return conn

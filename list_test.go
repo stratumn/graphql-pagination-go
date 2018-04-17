@@ -1,40 +1,41 @@
 package relay_test
 
 import (
-	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql/testutil"
-	"github.com/graphql-go/relay"
 	"reflect"
 	"testing"
+
+	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/graphql/testutil"
+	"github.com/stratumn/relay"
 )
 
-var connectionTestAllUsers = []interface{}{
+var listTestAllUsers = []interface{}{
 	&user{Name: "Dan"},
 	&user{Name: "Nick"},
 	&user{Name: "Lee"},
 	&user{Name: "Joe"},
 	&user{Name: "Tim"},
 }
-var connectionTestUserType *graphql.Object
-var connectionTestQueryType *graphql.Object
-var connectionTestSchema graphql.Schema
-var connectionTestConnectionDef *relay.GraphQLConnectionDefinitions
+var listTestUserType *graphql.Object
+var listTestQueryType *graphql.Object
+var listTestSchema graphql.Schema
+var listTestListDef *relay.GraphQLListDefinitions
 
 func init() {
-	connectionTestUserType = graphql.NewObject(graphql.ObjectConfig{
+	listTestUserType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "User",
 		Fields: graphql.Fields{
 			"name": &graphql.Field{
 				Type: graphql.String,
 			},
-			// re-define `friends` field later because `connectionTestUserType` has `connectionTestConnectionDef` has `connectionTestUserType` (cyclic-reference)
+			// re-define `friends` field later because `listTestUserType` has `listTestListDef` has `listTestUserType` (cyclic-reference)
 			"friends": &graphql.Field{},
 		},
 	})
 
-	connectionTestConnectionDef = relay.ConnectionDefinitions(relay.ConnectionConfig{
+	listTestListDef = relay.ListDefinitions(relay.ListConfig{
 		Name:     "Friend",
-		NodeType: connectionTestUserType,
+		NodeType: listTestUserType,
 		EdgeFields: graphql.Fields{
 			"friendshipTime": &graphql.Field{
 				Type: graphql.String,
@@ -43,41 +44,41 @@ func init() {
 				},
 			},
 		},
-		ConnectionFields: graphql.Fields{
+		ListFields: graphql.Fields{
 			"totalCount": &graphql.Field{
 				Type: graphql.Int,
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					return len(connectionTestAllUsers), nil
+					return len(listTestAllUsers), nil
 				},
 			},
 		},
 	})
 
-	// define `friends` field here after getting connection definition
-	connectionTestUserType.AddFieldConfig("friends", &graphql.Field{
-		Type: connectionTestConnectionDef.ConnectionType,
-		Args: relay.ConnectionArgs,
+	// define `friends` field here after getting list definition
+	listTestUserType.AddFieldConfig("friends", &graphql.Field{
+		Type: listTestListDef.ListType,
+		Args: relay.ListArgs,
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			arg := relay.NewConnectionArguments(p.Args)
-			res := relay.ConnectionFromArray(connectionTestAllUsers, arg)
+			arg := relay.NewListArguments(p.Args)
+			res := relay.ListFromArray(listTestAllUsers, arg)
 			return res, nil
 		},
 	})
 
-	connectionTestQueryType = graphql.NewObject(graphql.ObjectConfig{
+	listTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.Fields{
 			"user": &graphql.Field{
-				Type: connectionTestUserType,
+				Type: listTestUserType,
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					return connectionTestAllUsers[0], nil
+					return listTestAllUsers[0], nil
 				},
 			},
 		},
 	})
 	var err error
-	connectionTestSchema, err = graphql.NewSchema(graphql.SchemaConfig{
-		Query: connectionTestQueryType,
+	listTestSchema, err = graphql.NewSchema(graphql.SchemaConfig{
+		Query: listTestQueryType,
 	})
 	if err != nil {
 		panic(err)
@@ -85,7 +86,7 @@ func init() {
 
 }
 
-func TestConnectionDefinition_IncludesConnectionAndEdgeFields(t *testing.T) {
+func TestListDefinition_IncludesListAndEdgeFields(t *testing.T) {
 	query := `
       query FriendsQuery {
         user {
@@ -125,7 +126,7 @@ func TestConnectionDefinition_IncludesConnectionAndEdgeFields(t *testing.T) {
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        connectionTestSchema,
+		Schema:        listTestSchema,
 		RequestString: query,
 	})
 	if !reflect.DeepEqual(result, expected) {

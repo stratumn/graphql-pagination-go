@@ -4,9 +4,9 @@ import "github.com/graphql-go/graphql"
 
 /*
 Returns a GraphQLFieldConfigArgumentMap appropriate to include
-on a field whose return type is a connection type.
+on a field whose return type is a list type.
 */
-var ConnectionArgs = graphql.FieldConfigArgument{
+var ListArgs = graphql.FieldConfigArgument{
 	"before": &graphql.ArgumentConfig{
 		Type: graphql.String,
 	},
@@ -21,35 +21,33 @@ var ConnectionArgs = graphql.FieldConfigArgument{
 	},
 }
 
-func NewConnectionArgs(configMap graphql.FieldConfigArgument) graphql.FieldConfigArgument {
-	for fieldName, argConfig := range ConnectionArgs {
+func NewListArgs(configMap graphql.FieldConfigArgument) graphql.FieldConfigArgument {
+	for fieldName, argConfig := range ListArgs {
 		configMap[fieldName] = argConfig
 	}
 	return configMap
 }
 
-type ConnectionConfig struct {
-	Name             string          `json:"name"`
-	NodeType         *graphql.Object `json:"nodeType"`
-	EdgeFields       graphql.Fields  `json:"edgeFields"`
-	ConnectionFields graphql.Fields  `json:"connectionFields"`
+type ListConfig struct {
+	Name       string          `json:"name"`
+	NodeType   *graphql.Object `json:"nodeType"`
+	ListFields graphql.Fields  `json:"listFields"`
 }
 
 type EdgeType struct {
-	Node   interface{}      `json:"node"`
-	Cursor ConnectionCursor `json:"cursor"`
+	Node   interface{} `json:"node"`
+	Cursor ListCursor  `json:"cursor"`
 }
-type GraphQLConnectionDefinitions struct {
-	EdgeType       *graphql.Object `json:"edgeType"`
-	ConnectionType *graphql.Object `json:"connectionType"`
+type GraphQLListDefinitions struct {
+	ListType *graphql.Object `json:"listType"`
 }
 
 /*
-The common page info type used by all connections.
+The common page info type used by all lists.
 */
 var pageInfoType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "PageInfo",
-	Description: "Information about pagination in a connection.",
+	Description: "Information about pagination in a list.",
 	Fields: graphql.Fields{
 		"hasNextPage": &graphql.Field{
 			Type:        graphql.NewNonNull(graphql.Boolean),
@@ -70,52 +68,34 @@ var pageInfoType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-/*
-Returns a GraphQLObjectType for a connection with the given name,
-and whose nodes are of the specified type.
-*/
+// ListDefinitions returns a GraphQLObjectType for a list with the given name,
+// and whose nodes are of the specified type.
+func ListDefinitions(config ListConfig) *GraphQLListDefinitions {
 
-func ConnectionDefinitions(config ConnectionConfig) *GraphQLConnectionDefinitions {
-
-	edgeType := graphql.NewObject(graphql.ObjectConfig{
-		Name:        config.Name + "Edge",
-		Description: "An edge in a connection",
-		Fields: graphql.Fields{
-			"node": &graphql.Field{
-				Type:        config.NodeType,
-				Description: "The item at the end of the edge",
-			},
-			"cursor": &graphql.Field{
-				Type:        graphql.NewNonNull(graphql.String),
-				Description: " cursor for use in pagination",
-			},
-		},
-	})
-	for fieldName, fieldConfig := range config.EdgeFields {
-		edgeType.AddFieldConfig(fieldName, fieldConfig)
-	}
-
-	connectionType := graphql.NewObject(graphql.ObjectConfig{
-		Name:        config.Name + "Connection",
-		Description: "A connection to a list of items.",
+	listType := graphql.NewObject(graphql.ObjectConfig{
+		Name:        config.Name + "List",
+		Description: "list of items.",
 
 		Fields: graphql.Fields{
 			"pageInfo": &graphql.Field{
 				Type:        graphql.NewNonNull(pageInfoType),
 				Description: "Information to aid in pagination.",
 			},
-			"edges": &graphql.Field{
+			"elements": &graphql.Field{
+				Type:        graphql.NewList(config.NodeType),
+				Description: "Information to aid in pagination.",
+			},
+			"totalCount": &graphql.Field{
 				Type:        graphql.NewList(edgeType),
 				Description: "Information to aid in pagination.",
 			},
 		},
 	})
-	for fieldName, fieldConfig := range config.ConnectionFields {
-		connectionType.AddFieldConfig(fieldName, fieldConfig)
+	for fieldName, fieldConfig := range config.ListFields {
+		listType.AddFieldConfig(fieldName, fieldConfig)
 	}
 
-	return &GraphQLConnectionDefinitions{
-		EdgeType:       edgeType,
-		ConnectionType: connectionType,
+	return &GraphQLListDefinitions{
+		ListType: listType,
 	}
 }

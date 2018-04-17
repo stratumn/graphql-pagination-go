@@ -1,14 +1,15 @@
 package starwars_test
 
 import (
-	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql/testutil"
-	"github.com/graphql-go/relay/examples/starwars"
 	"reflect"
 	"testing"
+
+	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/graphql/testutil"
+	"github.com/stratumn/relay/examples/starwars"
 )
 
-func TestConnection_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *testing.T) {
+func TestList_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *testing.T) {
 	query := `
         query RebelsShipsQuery {
           rebels {
@@ -47,7 +48,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *test
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestConnection_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebelsWithACursor(t *testing.T) {
+func TestList_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebelsWithACursor(t *testing.T) {
 	query := `
         query MoreRebelShipsQuery {
           rebels {
@@ -94,7 +95,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebelsWith
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestConnection_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWithACursor(t *testing.T) {
+func TestList_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWithACursor(t *testing.T) {
 	query := `
         query EndOfRebelShipsQuery {
           rebels {
@@ -147,7 +148,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWit
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestConnection_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfTheConnection(t *testing.T) {
+func TestList_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfTheList(t *testing.T) {
 	query := `
         query RebelsQuery {
           rebels {
@@ -181,7 +182,7 @@ func TestConnection_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfThe
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestConnection_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T) {
+func TestList_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T) {
 	query := `
         query EndOfRebelShipsQuery {
           rebels {

@@ -8,7 +8,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
-	"github.com/graphql-go/relay"
+	"github.com/stratumn/relay"
 	"golang.org/x/net/context"
 )
 

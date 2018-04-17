@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/relay"
+	"github.com/stratumn/relay"
 	"golang.org/x/net/context"
 )
 
@@ -35,7 +35,7 @@ import (
  * type Faction : Node {
  *   id: ID!
  *   name: String
- *   ships: ShipConnection
+ *   ships: ShipList
  * }
  *
  * type Ship : Node {
@@ -43,7 +43,7 @@ import (
  *   name: String
  * }
  *
- * type ShipConnection {
+ * type ShipList {
  *   edges: [ShipEdge]
  *   pageInfo: PageInfo!
  * }
@@ -155,22 +155,22 @@ func init() {
 	})
 
 	/**
-	 * We define a connection between a faction and its ships.
+	 * We define a list between a faction and its ships.
 	 *
-	 * connectionType implements the following type system shorthand:
-	 *   type ShipConnection {
+	 * listType implements the following type system shorthand:
+	 *   type ShipList {
 	 *     edges: [ShipEdge]
 	 *     pageInfo: PageInfo!
 	 *   }
 	 *
-	 * connectionType has an edges field - a list of edgeTypes that implement the
+	 * listType has an edges field - a list of edgeTypes that implement the
 	 * following type system shorthand:
 	 *   type ShipEdge {
 	 *     cursor: String!
 	 *     node: Ship
 	 *   }
 	 */
-	shipConnectionDefinition := relay.ConnectionDefinitions(relay.ConnectionConfig{
+	shipListDefinition := relay.ListDefinitions(relay.ListConfig{
 		Name:     "Ship",
 		NodeType: shipType,
 	})
@@ -182,7 +182,7 @@ func init() {
 	 *   type Faction : Node {
 	 *     id: String!
 	 *     name: String
-	 *     ships: ShipConnection
+	 *     ships: ShipList
 	 *   }
 	 */
 	factionType = graphql.NewObject(graphql.ObjectConfig{
@@ -195,11 +195,11 @@ func init() {
 				Description: "The name of the faction.",
 			},
 			"ships": &graphql.Field{
-				Type: shipConnectionDefinition.ConnectionType,
-				Args: relay.ConnectionArgs,
+				Type: shipListDefinition.ListType,
+				Args: relay.ListArgs,
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					// convert args map[string]interface into ConnectionArguments
-					args := relay.NewConnectionArguments(p.Args)
+					// convert args map[string]interface into ListArguments
+					args := relay.NewListArguments(p.Args)
 
 					// get ship objects from current faction
 					ships := []interface{}{}
@@ -211,7 +211,7 @@ func init() {
 					// let relay library figure out the result, given
 					// - the list of ships for this faction
 					// - and the filter arguments (i.e. first, last, after, before)
-					return relay.ConnectionFromArray(ships, args), nil
+					return relay.ListFromArray(ships, args), nil
 				},
 			},
 		},
