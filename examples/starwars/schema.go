@@ -3,9 +3,10 @@ package starwars
 import (
 	"errors"
 
+	"context"
+
 	"github.com/graphql-go/graphql"
 	"github.com/stratumn/graphql-pagination-go"
-	"golang.org/x/net/context"
 )
 
 /**

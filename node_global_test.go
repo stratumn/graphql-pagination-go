@@ -6,10 +6,11 @@ import (
 	"reflect"
 	"testing"
 
+	"context"
+
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
 	pagination "github.com/stratumn/graphql-pagination-go"
-	"golang.org/x/net/context"
 )
 
 type photo2 struct {

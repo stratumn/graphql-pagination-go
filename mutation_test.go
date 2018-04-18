@@ -6,12 +6,13 @@ import (
 	"testing"
 	"time"
 
+	"context"
+
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/gqlerrors"
 	"github.com/graphql-go/graphql/language/location"
 	"github.com/graphql-go/graphql/testutil"
 	"github.com/stratumn/graphql-pagination-go"
-	"golang.org/x/net/context"
 )
 
 func testAsyncDataMutation(resultChan *chan int) {
