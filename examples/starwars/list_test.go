@@ -42,6 +42,7 @@ func TestList_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *testing.T)
 	})
 	assert.EqualValues(t, expected, result)
 }
+
 func TestList_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebels(t *testing.T) {
 	query := `
         query MoreRebelShipsQuery {
@@ -78,6 +79,7 @@ func TestList_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebels(t *testin
 	})
 	assert.EqualValues(t, expected, result)
 }
+
 func TestList_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWithACursor(t *testing.T) {
 	query := `
         query EndOfRebelShipsQuery {
@@ -117,6 +119,7 @@ func TestList_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWithACurs
 	})
 	assert.EqualValues(t, expected, result)
 }
+
 func TestList_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfTheList(t *testing.T) {
 	query := `
         query RebelsQuery {
@@ -146,6 +149,7 @@ func TestList_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfTheList(t
 	})
 	assert.EqualValues(t, expected, result)
 }
+
 func TestList_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T) {
 	query := `
         query EndOfRebelShipsQuery {

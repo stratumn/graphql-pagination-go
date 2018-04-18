@@ -1,12 +1,11 @@
 package pagination_test
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql/testutil"
 	pagination "github.com/stratumn/graphql-pagination-go"
+	"github.com/stretchr/testify/assert"
 )
 
 var listTestAllUsers = []interface{}{
@@ -36,19 +35,11 @@ func init() {
 	listTestListDef = pagination.ListDefinitions(pagination.ListConfig{
 		Name:     "Friend",
 		NodeType: listTestUserType,
-		EdgeFields: graphql.Fields{
-			"friendshipTime": &graphql.Field{
-				Type: graphql.String,
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					return "Yesterday", nil
-				},
-			},
-		},
 		ListFields: graphql.Fields{
-			"totalCount": &graphql.Field{
+			"totalMaleCount": &graphql.Field{
 				Type: graphql.Int,
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					return len(listTestAllUsers), nil
+					return len(listTestAllUsers) / 2, nil
 				},
 			},
 		},
@@ -92,11 +83,9 @@ func TestListDefinition_IncludesListAndEdgeFields(t *testing.T) {
         user {
           friends(first: 2) {
             totalCount
-            edges {
-              friendshipTime
-              node {
-                name
-              }
+            totalMaleCount
+            items {
+              name
             }
           }
         }
@@ -106,19 +95,14 @@ func TestListDefinition_IncludesListAndEdgeFields(t *testing.T) {
 		Data: map[string]interface{}{
 			"user": map[string]interface{}{
 				"friends": map[string]interface{}{
-					"totalCount": 5,
-					"edges": []interface{}{
+					"totalCount":     5,
+					"totalMaleCount": 2,
+					"items": []interface{}{
 						map[string]interface{}{
-							"friendshipTime": "Yesterday",
-							"node": map[string]interface{}{
-								"name": "Dan",
-							},
+							"name": "Dan",
 						},
 						map[string]interface{}{
-							"friendshipTime": "Yesterday",
-							"node": map[string]interface{}{
-								"name": "Nick",
-							},
+							"name": "Nick",
 						},
 					},
 				},
@@ -129,7 +113,5 @@ func TestListDefinition_IncludesListAndEdgeFields(t *testing.T) {
 		Schema:        listTestSchema,
 		RequestString: query,
 	})
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }

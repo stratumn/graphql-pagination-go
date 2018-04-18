@@ -10,6 +10,8 @@ import (
 	"github.com/graphql-go/graphql/language/location"
 	"github.com/graphql-go/graphql/testutil"
 	"github.com/kr/pretty"
+	"github.com/stratumn/graphql-pagination-go"
+	"github.com/stretchr/testify/assert"
 )
 
 var pluralTestUserType = graphql.NewObject(graphql.ObjectConfig{
@@ -196,6 +198,7 @@ func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *tes
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
+
 func TestPluralIdentifyingRootField_Configuration_ArgNames_WrongArgNameSpecified(t *testing.T) {
 
 	t.Skipf("Pending `validator` implementation")
@@ -227,6 +230,7 @@ func TestPluralIdentifyingRootField_Configuration_ArgNames_WrongArgNameSpecified
 		RequestString: query,
 	})
 	pretty.Println(result)
+	assert.True(t, false)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}

@@ -1,11 +1,10 @@
 package pagination_test
 
 import (
-	"reflect"
 	"testing"
 
-	"github.com/graphql-go/graphql/testutil"
 	"github.com/stratumn/graphql-pagination-go"
+	"github.com/stretchr/testify/assert"
 )
 
 var arrayListTestLetters = []interface{}{
@@ -16,41 +15,20 @@ func TestListFromArray_HandlesBasicSlicing_ReturnsAllElementsWithoutFilters(t *t
 	args := pagination.NewListArguments(nil)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "A",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
-			},
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-			&pagination.Edge{
-				Node:   "E",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
-			},
-		},
+		Items: []interface{}{"A", "B", "C", "D", "E"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesBasicSlicing_RespectsASmallerFirst(t *testing.T) {
 	// Create list arguments from map[string]interface{},
 	// which you usually get from types.GQLParams.Args
@@ -64,29 +42,20 @@ func TestListFromArray_HandlesBasicSlicing_RespectsASmallerFirst(t *testing.T) {
 	// args.First = 2
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "A",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
-			},
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-		},
+		Items: []interface{}{"A", "B"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjE=",
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeFirst(t *testing.T) {
 
 	filter := map[string]interface{}{
@@ -95,41 +64,20 @@ func TestListFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeFirst(t *testing
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "A",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
-			},
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-			&pagination.Edge{
-				Node:   "E",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
-			},
-		},
+		Items: []interface{}{"A", "B", "C", "D", "E"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesBasicSlicing_RespectsASmallerLast(t *testing.T) {
 
 	filter := map[string]interface{}{
@@ -138,29 +86,20 @@ func TestListFromArray_HandlesBasicSlicing_RespectsASmallerLast(t *testing.T) {
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-			&pagination.Edge{
-				Node:   "E",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
-			},
-		},
+		Items: []interface{}{"D", "E"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjM=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: true,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeLast(t *testing.T) {
 
 	filter := map[string]interface{}{
@@ -169,40 +108,18 @@ func TestListFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeLast(t *testing.
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "A",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
-			},
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-			&pagination.Edge{
-				Node:   "E",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
-			},
-		},
+		Items: []interface{}{"A", "B", "C", "D", "E"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
 
 func TestListFromArray_HandlesPagination_RespectsFirstAndAfter(t *testing.T) {
@@ -214,29 +131,20 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfter(t *testing.T) {
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-		},
+		Items: []interface{}{"C", "D"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesPagination_RespectsFirstAndAfterWithLongFirst(t *testing.T) {
 
 	filter := map[string]interface{}{
@@ -246,33 +154,20 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterWithLongFirst(t *t
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-			&pagination.Edge{
-				Node:   "E",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
-			},
-		},
+		Items: []interface{}{"C", "D", "E"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesPagination_RespectsLastAndBefore(t *testing.T) {
 	filter := map[string]interface{}{
 		"last":   2,
@@ -281,29 +176,20 @@ func TestListFromArray_HandlesPagination_RespectsLastAndBefore(t *testing.T) {
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-		},
+		Items: []interface{}{"B", "C"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: true,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesPagination_RespectsLastAndBeforeWithLongLast(t *testing.T) {
 	filter := map[string]interface{}{
 		"last":   10,
@@ -312,33 +198,20 @@ func TestListFromArray_HandlesPagination_RespectsLastAndBeforeWithLongLast(t *te
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "A",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
-			},
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-		},
+		Items: []interface{}{"A", "B", "C"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_TooFew(t *testing.T) {
 	filter := map[string]interface{}{
 		"first":  2,
@@ -348,29 +221,20 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_TooFew(t
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-		},
+		Items: []interface{}{"B", "C"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_TooMany(t *testing.T) {
 	filter := map[string]interface{}{
 		"first":  4,
@@ -380,33 +244,20 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_TooMany(
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-		},
+		Items: []interface{}{"B", "C", "D"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_ExactlyRight(t *testing.T) {
 	filter := map[string]interface{}{
 		"first":  3,
@@ -416,33 +267,20 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_ExactlyR
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-		},
+		Items: []interface{}{"B", "C", "D"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_TooFew(t *testing.T) {
 	filter := map[string]interface{}{
 		"last":   2,
@@ -452,29 +290,20 @@ func TestListFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_TooFew(t 
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-		},
+		Items: []interface{}{"C", "D"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: true,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesPagination_RespectsLasttAndAfterAndBefore_TooMany(t *testing.T) {
 	filter := map[string]interface{}{
 		"last":   4,
@@ -484,33 +313,20 @@ func TestListFromArray_HandlesPagination_RespectsLasttAndAfterAndBefore_TooMany(
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-		},
+		Items: []interface{}{"B", "C", "D"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_ExactlyRight(t *testing.T) {
 	filter := map[string]interface{}{
 		"last":   3,
@@ -520,32 +336,18 @@ func TestListFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_ExactlyRi
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-		},
+		Items: []interface{}{"B", "C", "D"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
 
 func TestListFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfFirstIsZero(t *testing.T) {
@@ -555,18 +357,18 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfFirstIsZero(t *
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{},
+		Items: []interface{}{},
 		PageInfo: pagination.PageInfo{
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreInvalid(t *testing.T) {
 	filter := map[string]interface{}{
 		"before": "invalid",
@@ -575,41 +377,20 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreInva
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "A",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
-			},
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-			&pagination.Edge{
-				Node:   "E",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
-			},
-		},
+		Items: []interface{}{"A", "B", "C", "D", "E"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreOnTheOutside(t *testing.T) {
 	filter := map[string]interface{}{
 		"before": "YXJyYXljb25uZWN0aW9uOjYK",     // ==> offset: int(6)
@@ -618,40 +399,18 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreOnTh
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "A",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
-			},
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-			&pagination.Edge{
-				Node:   "E",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
-			},
-		},
+		Items: []interface{}{"A", "B", "C", "D", "E"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
 
 func TestListFromArray_HandlesCursorEdgeCases_ReturnsNullIfCursorsIsConsecutive(t *testing.T) {
@@ -662,15 +421,15 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsNullIfCursorsIsConsecutive(
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges:    []*pagination.Edge{},
-		PageInfo: pagination.PageInfo{},
+		Items:      []interface{}{},
+		PageInfo:   pagination.PageInfo{},
+		TotalCount: 5,
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfCursorsCross(t *testing.T) {
 	filter := map[string]interface{}{
 		"before": "YXJyYXljb25uZWN0aW9uOjI=", // ==> offset: int(2)
@@ -679,27 +438,24 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfCursorsCross(t 
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges:    []*pagination.Edge{},
-		PageInfo: pagination.PageInfo{},
+		Items:      []interface{}{},
+		PageInfo:   pagination.PageInfo{},
+		TotalCount: 0, // better to raise an error if possible
 	}
 
 	result := pagination.ListFromArray(arrayListTestLetters, args)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
+
 func TestListFromArray_CursorForObjectInList_ReturnsAnEdgeCursor_GivenAnArrayAndAMemberObject(t *testing.T) {
 	letterBCursor := pagination.CursorForObjectInList(arrayListTestLetters, "B")
 	expected := pagination.ListCursor("YXJyYXljb25uZWN0aW9uOjE=")
-	if !reflect.DeepEqual(letterBCursor, expected) {
-		t.Fatalf("wrong result, cursor result diff: %v", testutil.Diff(expected, letterBCursor))
-	}
+	assert.EqualValues(t, expected, letterBCursor)
 }
+
 func TestListFromArray_CursorForObjectInList_ReturnsEmptyCursor_GivenAnArrayAndANonMemberObject(t *testing.T) {
 	letterFCursor := pagination.CursorForObjectInList(arrayListTestLetters, "F")
-	if letterFCursor != "" {
-		t.Fatalf("wrong result, expected empty cursor, got: %v", letterFCursor)
-	}
+	assert.EqualValues(t, "", letterFCursor)
 }
 
 func TestListFromArraySlice_JustRightArraySlice(t *testing.T) {
@@ -710,22 +466,14 @@ func TestListFromArraySlice_JustRightArraySlice(t *testing.T) {
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-		},
+		Items: []interface{}{"B", "C"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
+		TotalCount: 2,
 	}
 
 	result := pagination.ListFromArraySlice(
@@ -736,9 +484,7 @@ func TestListFromArraySlice_JustRightArraySlice(t *testing.T) {
 			ArrayLength: 5,
 		},
 	)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
 
 func TestListFromArraySlice_OversizedSliceLeft(t *testing.T) {
@@ -749,22 +495,14 @@ func TestListFromArraySlice_OversizedSliceLeft(t *testing.T) {
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "B",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
-			},
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-		},
+		Items: []interface{}{"B", "C"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
+		TotalCount: 3,
 	}
 
 	result := pagination.ListFromArraySlice(
@@ -775,9 +513,7 @@ func TestListFromArraySlice_OversizedSliceLeft(t *testing.T) {
 			ArrayLength: 5,
 		},
 	)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
 
 func TestListFromArraySlice_OversizedSliceRight(t *testing.T) {
@@ -788,18 +524,14 @@ func TestListFromArraySlice_OversizedSliceRight(t *testing.T) {
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-		},
+		Items: []interface{}{"C"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
+		TotalCount: 2,
 	}
 
 	result := pagination.ListFromArraySlice(
@@ -810,9 +542,7 @@ func TestListFromArraySlice_OversizedSliceRight(t *testing.T) {
 			ArrayLength: 5,
 		},
 	)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
 
 func TestListFromArraySlice_OversizedSliceBoth(t *testing.T) {
@@ -823,18 +553,14 @@ func TestListFromArraySlice_OversizedSliceBoth(t *testing.T) {
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-		},
+		Items: []interface{}{"C"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
+		TotalCount: 3,
 	}
 
 	result := pagination.ListFromArraySlice(
@@ -845,9 +571,7 @@ func TestListFromArraySlice_OversizedSliceBoth(t *testing.T) {
 			ArrayLength: 5,
 		},
 	)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
 
 func TestListFromArraySlice_UndersizedSliceLeft(t *testing.T) {
@@ -858,22 +582,14 @@ func TestListFromArraySlice_UndersizedSliceLeft(t *testing.T) {
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-			&pagination.Edge{
-				Node:   "E",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
-			},
-		},
+		Items: []interface{}{"D", "E"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjM=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
 			HasNextPage:     false,
 		},
+		TotalCount: 2,
 	}
 
 	result := pagination.ListFromArraySlice(
@@ -884,9 +600,7 @@ func TestListFromArraySlice_UndersizedSliceLeft(t *testing.T) {
 			ArrayLength: 5,
 		},
 	)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
 
 func TestListFromArraySlice_UndersizedSliceRight(t *testing.T) {
@@ -897,22 +611,14 @@ func TestListFromArraySlice_UndersizedSliceRight(t *testing.T) {
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "C",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
-			},
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-		},
+		Items: []interface{}{"C", "D"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
+		TotalCount: 2,
 	}
 
 	result := pagination.ListFromArraySlice(
@@ -923,9 +629,7 @@ func TestListFromArraySlice_UndersizedSliceRight(t *testing.T) {
 			ArrayLength: 5,
 		},
 	)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
 
 func TestListFromArraySlice_UndersizedSliceBoth(t *testing.T) {
@@ -936,18 +640,14 @@ func TestListFromArraySlice_UndersizedSliceBoth(t *testing.T) {
 	args := pagination.NewListArguments(filter)
 
 	expected := &pagination.List{
-		Edges: []*pagination.Edge{
-			&pagination.Edge{
-				Node:   "D",
-				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
-			},
-		},
+		Items: []interface{}{"D"},
 		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjM=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
+		TotalCount: 1,
 	}
 
 	result := pagination.ListFromArraySlice(
@@ -958,7 +658,5 @@ func TestListFromArraySlice_UndersizedSliceBoth(t *testing.T) {
 			ArrayLength: 5,
 		},
 	)
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
