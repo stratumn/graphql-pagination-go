@@ -1,11 +1,12 @@
 package starwars_test
 
 import (
-	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql/testutil"
-	"github.com/stratumn/relay/examples/starwars"
 	"reflect"
 	"testing"
+
+	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/graphql/testutil"
+	"github.com/stratumn/graphql-pagination-go/examples/starwars"
 )
 
 func TestObjectIdentification_TestFetching_CorrectlyFetchesTheIDAndTheNameOfTheRebels(t *testing.T) {

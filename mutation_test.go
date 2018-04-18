@@ -1,4 +1,4 @@
-package relay_test
+package pagination_test
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 	"github.com/graphql-go/graphql/gqlerrors"
 	"github.com/graphql-go/graphql/language/location"
 	"github.com/graphql-go/graphql/testutil"
-	"github.com/stratumn/relay"
+	"github.com/stratumn/graphql-pagination-go"
 	"golang.org/x/net/context"
 )
 
@@ -20,7 +20,7 @@ func testAsyncDataMutation(resultChan *chan int) {
 	*resultChan <- int(1)
 }
 
-var simpleMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig{
+var simpleMutationTest = pagination.MutationWithClientMutationID(pagination.MutationConfig{
 	Name:        "SimpleMutation",
 	InputFields: graphql.InputObjectConfigFieldMap{},
 	OutputFields: graphql.Fields{
@@ -37,7 +37,7 @@ var simpleMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig
 
 var NotFoundError = errors.New("not found")
 
-var simpleMutationErrorTest = relay.MutationWithClientMutationID(relay.MutationConfig{
+var simpleMutationErrorTest = pagination.MutationWithClientMutationID(pagination.MutationConfig{
 	Name:        "SimpleMutation",
 	InputFields: graphql.InputObjectConfigFieldMap{},
 	OutputFields: graphql.Fields{
@@ -51,7 +51,7 @@ var simpleMutationErrorTest = relay.MutationWithClientMutationID(relay.MutationC
 })
 
 // async mutation
-var simplePromiseMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig{
+var simplePromiseMutationTest = pagination.MutationWithClientMutationID(pagination.MutationConfig{
 	Name:        "SimplePromiseMutation",
 	InputFields: graphql.InputObjectConfigFieldMap{},
 	OutputFields: graphql.Fields{

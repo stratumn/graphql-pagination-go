@@ -1,4 +1,4 @@
-package relay_test
+package pagination_test
 
 import (
 	"reflect"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
-	"github.com/stratumn/relay"
+	pagination "github.com/stratumn/graphql-pagination-go"
 )
 
 var listTestAllUsers = []interface{}{
@@ -19,7 +19,7 @@ var listTestAllUsers = []interface{}{
 var listTestUserType *graphql.Object
 var listTestQueryType *graphql.Object
 var listTestSchema graphql.Schema
-var listTestListDef *relay.GraphQLListDefinitions
+var listTestListDef *pagination.GraphQLListDefinitions
 
 func init() {
 	listTestUserType = graphql.NewObject(graphql.ObjectConfig{
@@ -33,7 +33,7 @@ func init() {
 		},
 	})
 
-	listTestListDef = relay.ListDefinitions(relay.ListConfig{
+	listTestListDef = pagination.ListDefinitions(pagination.ListConfig{
 		Name:     "Friend",
 		NodeType: listTestUserType,
 		EdgeFields: graphql.Fields{
@@ -57,10 +57,10 @@ func init() {
 	// define `friends` field here after getting list definition
 	listTestUserType.AddFieldConfig("friends", &graphql.Field{
 		Type: listTestListDef.ListType,
-		Args: relay.ListArgs,
+		Args: pagination.ListArgs,
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			arg := relay.NewListArguments(p.Args)
-			res := relay.ListFromArray(listTestAllUsers, arg)
+			arg := pagination.NewListArguments(p.Args)
+			res := pagination.ListFromArray(listTestAllUsers, arg)
 			return res, nil
 		},
 	})

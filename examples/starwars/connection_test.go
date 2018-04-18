@@ -6,7 +6,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
-	"github.com/stratumn/relay/examples/starwars"
+	"github.com/stratumn/graphql-pagination-go/examples/starwars"
 )
 
 func TestList_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *testing.T) {

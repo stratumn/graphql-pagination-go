@@ -1,4 +1,4 @@
-package relay_test
+package pagination_test
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
-	"github.com/stratumn/relay"
+	pagination "github.com/stratumn/graphql-pagination-go"
 	"golang.org/x/net/context"
 )
 
@@ -31,9 +31,9 @@ var globalIDTestPhotoData = map[string]*photo2{
 var globalIDTestUserType *graphql.Object
 var globalIDTestPhotoType *graphql.Object
 
-var globalIDTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
+var globalIDTestDef = pagination.NewNodeDefinitions(pagination.NodeDefinitionsConfig{
 	IDFetcher: func(globalID string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error) {
-		resolvedGlobalID := relay.FromGlobalID(globalID)
+		resolvedGlobalID := pagination.FromGlobalID(globalID)
 		if resolvedGlobalID == nil {
 			return nil, errors.New("Unknown node id")
 		}
@@ -83,7 +83,7 @@ func init() {
 	globalIDTestUserType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "User",
 		Fields: graphql.Fields{
-			"id": relay.GlobalIDField("User", nil),
+			"id": pagination.GlobalIDField("User", nil),
 			"name": &graphql.Field{
 				Type: graphql.String,
 			},
@@ -100,7 +100,7 @@ func init() {
 	globalIDTestPhotoType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Photo",
 		Fields: graphql.Fields{
-			"id": relay.GlobalIDField("Photo", photoIDFetcher),
+			"id": pagination.GlobalIDField("Photo", photoIDFetcher),
 			"width": &graphql.Field{
 				Type: graphql.Int,
 			},

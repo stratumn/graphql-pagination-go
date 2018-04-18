@@ -1,11 +1,11 @@
-package relay_test
+package pagination_test
 
 import (
 	"reflect"
 	"testing"
 
 	"github.com/graphql-go/graphql/testutil"
-	"github.com/stratumn/relay"
+	"github.com/stratumn/graphql-pagination-go"
 )
 
 var arrayListTestLetters = []interface{}{
@@ -13,32 +13,32 @@ var arrayListTestLetters = []interface{}{
 }
 
 func TestListFromArray_HandlesBasicSlicing_ReturnsAllElementsWithoutFilters(t *testing.T) {
-	args := relay.NewListArguments(nil)
+	args := pagination.NewListArguments(nil)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -46,7 +46,7 @@ func TestListFromArray_HandlesBasicSlicing_ReturnsAllElementsWithoutFilters(t *t
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -57,24 +57,24 @@ func TestListFromArray_HandlesBasicSlicing_RespectsASmallerFirst(t *testing.T) {
 	filter := map[string]interface{}{
 		"first": 2,
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
 	// Alternatively, you can create list arg the following way.
-	// args := relay.NewListArguments(filter)
+	// args := pagination.NewListArguments(filter)
 	// args.First = 2
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjE=",
 			HasPreviousPage: false,
@@ -82,7 +82,7 @@ func TestListFromArray_HandlesBasicSlicing_RespectsASmallerFirst(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -92,32 +92,32 @@ func TestListFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeFirst(t *testing
 	filter := map[string]interface{}{
 		"first": 10,
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -125,7 +125,7 @@ func TestListFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeFirst(t *testing
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -135,20 +135,20 @@ func TestListFromArray_HandlesBasicSlicing_RespectsASmallerLast(t *testing.T) {
 	filter := map[string]interface{}{
 		"last": 2,
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjM=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: true,
@@ -156,7 +156,7 @@ func TestListFromArray_HandlesBasicSlicing_RespectsASmallerLast(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -166,32 +166,32 @@ func TestListFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeLast(t *testing.
 	filter := map[string]interface{}{
 		"last": 10,
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -199,7 +199,7 @@ func TestListFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeLast(t *testing.
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -211,20 +211,20 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfter(t *testing.T) {
 		"first": 2,
 		"after": "YXJyYXljb25uZWN0aW9uOjE=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -232,7 +232,7 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfter(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -243,24 +243,24 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterWithLongFirst(t *t
 		"first": 10,
 		"after": "YXJyYXljb25uZWN0aW9uOjE=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -268,7 +268,7 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterWithLongFirst(t *t
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -278,20 +278,20 @@ func TestListFromArray_HandlesPagination_RespectsLastAndBefore(t *testing.T) {
 		"last":   2,
 		"before": "YXJyYXljb25uZWN0aW9uOjM=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: true,
@@ -299,7 +299,7 @@ func TestListFromArray_HandlesPagination_RespectsLastAndBefore(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -309,24 +309,24 @@ func TestListFromArray_HandlesPagination_RespectsLastAndBeforeWithLongLast(t *te
 		"last":   10,
 		"before": "YXJyYXljb25uZWN0aW9uOjM=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
@@ -334,7 +334,7 @@ func TestListFromArray_HandlesPagination_RespectsLastAndBeforeWithLongLast(t *te
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -345,20 +345,20 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_TooFew(t
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
@@ -366,7 +366,7 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_TooFew(t
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -377,24 +377,24 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_TooMany(
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -402,7 +402,7 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_TooMany(
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -413,24 +413,24 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_ExactlyR
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -438,7 +438,7 @@ func TestListFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_ExactlyR
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -449,20 +449,20 @@ func TestListFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_TooFew(t 
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: true,
@@ -470,7 +470,7 @@ func TestListFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_TooFew(t 
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -481,24 +481,24 @@ func TestListFromArray_HandlesPagination_RespectsLasttAndAfterAndBefore_TooMany(
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -506,7 +506,7 @@ func TestListFromArray_HandlesPagination_RespectsLasttAndAfterAndBefore_TooMany(
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -517,24 +517,24 @@ func TestListFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_ExactlyRi
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -542,7 +542,7 @@ func TestListFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_ExactlyRi
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -552,17 +552,17 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfFirstIsZero(t *
 	filter := map[string]interface{}{
 		"first": 0,
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{},
-		PageInfo: relay.PageInfo{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{},
+		PageInfo: pagination.PageInfo{
 			HasPreviousPage: false,
 			HasNextPage:     true,
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -572,32 +572,32 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreInva
 		"before": "invalid",
 		"after":  "invalid",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -605,7 +605,7 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreInva
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -615,32 +615,32 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreOnTh
 		"before": "YXJyYXljb25uZWN0aW9uOjYK",     // ==> offset: int(6)
 		"after":  "YXJyYXljb25uZWN0aW9uOi0xCg==", // ==> offset: int(-1)
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -648,7 +648,7 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreOnTh
 		},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -659,14 +659,14 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsNullIfCursorsIsConsecutive(
 		"before": "YXJyYXljb25uZWN0aW9uOjM=", // ==> offset: int(3)
 		"after":  "YXJyYXljb25uZWN0aW9uOjI=", // ==> offset: int(2)
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges:    []*relay.Edge{},
-		PageInfo: relay.PageInfo{},
+	expected := &pagination.List{
+		Edges:    []*pagination.Edge{},
+		PageInfo: pagination.PageInfo{},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
@@ -676,27 +676,27 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfCursorsCross(t 
 		"before": "YXJyYXljb25uZWN0aW9uOjI=", // ==> offset: int(2)
 		"after":  "YXJyYXljb25uZWN0aW9uOjQ=", // ==> offset: int(4)
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges:    []*relay.Edge{},
-		PageInfo: relay.PageInfo{},
+	expected := &pagination.List{
+		Edges:    []*pagination.Edge{},
+		PageInfo: pagination.PageInfo{},
 	}
 
-	result := relay.ListFromArray(arrayListTestLetters, args)
+	result := pagination.ListFromArray(arrayListTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, list result diff: %v", testutil.Diff(expected, result))
 	}
 }
 func TestListFromArray_CursorForObjectInList_ReturnsAnEdgeCursor_GivenAnArrayAndAMemberObject(t *testing.T) {
-	letterBCursor := relay.CursorForObjectInList(arrayListTestLetters, "B")
-	expected := relay.ListCursor("YXJyYXljb25uZWN0aW9uOjE=")
+	letterBCursor := pagination.CursorForObjectInList(arrayListTestLetters, "B")
+	expected := pagination.ListCursor("YXJyYXljb25uZWN0aW9uOjE=")
 	if !reflect.DeepEqual(letterBCursor, expected) {
 		t.Fatalf("wrong result, cursor result diff: %v", testutil.Diff(expected, letterBCursor))
 	}
 }
 func TestListFromArray_CursorForObjectInList_ReturnsEmptyCursor_GivenAnArrayAndANonMemberObject(t *testing.T) {
-	letterFCursor := relay.CursorForObjectInList(arrayListTestLetters, "F")
+	letterFCursor := pagination.CursorForObjectInList(arrayListTestLetters, "F")
 	if letterFCursor != "" {
 		t.Fatalf("wrong result, expected empty cursor, got: %v", letterFCursor)
 	}
@@ -707,20 +707,20 @@ func TestListFromArraySlice_JustRightArraySlice(t *testing.T) {
 		"first": 2,
 		"after": "YXJyYXljb25uZWN0aW9uOjA=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
@@ -728,10 +728,10 @@ func TestListFromArraySlice_JustRightArraySlice(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArraySlice(
+	result := pagination.ListFromArraySlice(
 		arrayListTestLetters[1:3],
 		args,
-		relay.ArraySliceMetaInfo{
+		pagination.ArraySliceMetaInfo{
 			SliceStart:  1,
 			ArrayLength: 5,
 		},
@@ -746,20 +746,20 @@ func TestListFromArraySlice_OversizedSliceLeft(t *testing.T) {
 		"first": 2,
 		"after": "YXJyYXljb25uZWN0aW9uOjA=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
@@ -767,10 +767,10 @@ func TestListFromArraySlice_OversizedSliceLeft(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArraySlice(
+	result := pagination.ListFromArraySlice(
 		arrayListTestLetters[0:3],
 		args,
-		relay.ArraySliceMetaInfo{
+		pagination.ArraySliceMetaInfo{
 			SliceStart:  0,
 			ArrayLength: 5,
 		},
@@ -785,16 +785,16 @@ func TestListFromArraySlice_OversizedSliceRight(t *testing.T) {
 		"first": 1,
 		"after": "YXJyYXljb25uZWN0aW9uOjE=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
@@ -802,10 +802,10 @@ func TestListFromArraySlice_OversizedSliceRight(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArraySlice(
+	result := pagination.ListFromArraySlice(
 		arrayListTestLetters[2:4],
 		args,
-		relay.ArraySliceMetaInfo{
+		pagination.ArraySliceMetaInfo{
 			SliceStart:  2,
 			ArrayLength: 5,
 		},
@@ -820,16 +820,16 @@ func TestListFromArraySlice_OversizedSliceBoth(t *testing.T) {
 		"first": 1,
 		"after": "YXJyYXljb25uZWN0aW9uOjE=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
@@ -837,10 +837,10 @@ func TestListFromArraySlice_OversizedSliceBoth(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArraySlice(
+	result := pagination.ListFromArraySlice(
 		arrayListTestLetters[1:4],
 		args,
-		relay.ArraySliceMetaInfo{
+		pagination.ArraySliceMetaInfo{
 			SliceStart:  1,
 			ArrayLength: 5,
 		},
@@ -855,20 +855,20 @@ func TestListFromArraySlice_UndersizedSliceLeft(t *testing.T) {
 		"first": 3,
 		"after": "YXJyYXljb25uZWN0aW9uOjE=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjM=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -876,10 +876,10 @@ func TestListFromArraySlice_UndersizedSliceLeft(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArraySlice(
+	result := pagination.ListFromArraySlice(
 		arrayListTestLetters[3:5],
 		args,
-		relay.ArraySliceMetaInfo{
+		pagination.ArraySliceMetaInfo{
 			SliceStart:  3,
 			ArrayLength: 5,
 		},
@@ -894,20 +894,20 @@ func TestListFromArraySlice_UndersizedSliceRight(t *testing.T) {
 		"first": 3,
 		"after": "YXJyYXljb25uZWN0aW9uOjE=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&relay.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -915,10 +915,10 @@ func TestListFromArraySlice_UndersizedSliceRight(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArraySlice(
+	result := pagination.ListFromArraySlice(
 		arrayListTestLetters[2:4],
 		args,
-		relay.ArraySliceMetaInfo{
+		pagination.ArraySliceMetaInfo{
 			SliceStart:  2,
 			ArrayLength: 5,
 		},
@@ -933,16 +933,16 @@ func TestListFromArraySlice_UndersizedSliceBoth(t *testing.T) {
 		"first": 3,
 		"after": "YXJyYXljb25uZWN0aW9uOjE=",
 	}
-	args := relay.NewListArguments(filter)
+	args := pagination.NewListArguments(filter)
 
-	expected := &relay.List{
-		Edges: []*relay.Edge{
-			&relay.Edge{
+	expected := &pagination.List{
+		Edges: []*pagination.Edge{
+			&pagination.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: relay.PageInfo{
+		PageInfo: pagination.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjM=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -950,10 +950,10 @@ func TestListFromArraySlice_UndersizedSliceBoth(t *testing.T) {
 		},
 	}
 
-	result := relay.ListFromArraySlice(
+	result := pagination.ListFromArraySlice(
 		arrayListTestLetters[3:4],
 		args,
-		relay.ArraySliceMetaInfo{
+		pagination.ArraySliceMetaInfo{
 			SliceStart:  3,
 			ArrayLength: 5,
 		},

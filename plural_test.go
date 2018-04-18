@@ -1,15 +1,15 @@
-package relay_test
+package pagination_test
 
 import (
 	"fmt"
+	"reflect"
+	"testing"
+
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/gqlerrors"
 	"github.com/graphql-go/graphql/language/location"
 	"github.com/graphql-go/graphql/testutil"
-	"github.com/stratumn/relay"
 	"github.com/kr/pretty"
-	"reflect"
-	"testing"
 )
 
 var pluralTestUserType = graphql.NewObject(graphql.ObjectConfig{
@@ -27,7 +27,7 @@ var pluralTestUserType = graphql.NewObject(graphql.ObjectConfig{
 var pluralTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
 	Fields: graphql.Fields{
-		"usernames": relay.PluralIdentifyingRootField(relay.PluralIdentifyingRootFieldConfig{
+		"usernames": pagination.PluralIdentifyingRootField(pagination.PluralIdentifyingRootFieldConfig{
 			ArgName:     "usernames",
 			Description: "Map from a username to the user",
 			InputType:   graphql.String,
@@ -164,7 +164,7 @@ func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *tes
 	var pluralTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.Fields{
-			"usernames": relay.PluralIdentifyingRootField(relay.PluralIdentifyingRootFieldConfig{
+			"usernames": pagination.PluralIdentifyingRootField(pagination.PluralIdentifyingRootFieldConfig{
 				ArgName:     "usernames",
 				Description: "Map from a username to the user",
 				InputType:   graphql.String,

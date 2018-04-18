@@ -1,4 +1,4 @@
-package relay_test
+package pagination_test
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 	"github.com/graphql-go/graphql/gqlerrors"
 	"github.com/graphql-go/graphql/language/location"
 	"github.com/graphql-go/graphql/testutil"
-	"github.com/stratumn/relay"
+	pagination "github.com/stratumn/graphql-pagination-go"
 	"golang.org/x/net/context"
 )
 
@@ -37,7 +37,7 @@ var nodeTestPhotoData = map[string]*photo{
 var nodeTestUserType *graphql.Object
 var nodeTestPhotoType *graphql.Object
 
-var nodeTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
+var nodeTestDef = pagination.NewNodeDefinitions(pagination.NodeDefinitionsConfig{
 	IDFetcher: func(id string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error) {
 		if user, ok := nodeTestUserData[id]; ok {
 			return user, nil

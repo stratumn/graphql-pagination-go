@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/graphql-go/graphql"
-	"github.com/stratumn/relay"
+	"github.com/stratumn/graphql-pagination-go"
 	"golang.org/x/net/context"
 )
 
@@ -89,7 +89,7 @@ import (
 // - shipType refers to
 // - nodeDefinitions
 
-var nodeDefinitions *relay.NodeDefinitions
+var nodeDefinitions *pagination.NodeDefinitions
 var shipType *graphql.Object
 var factionType *graphql.Object
 
@@ -104,10 +104,10 @@ func init() {
 	 * The first method is the way we resolve an ID to its object. The second is the
 	 * way we resolve an object that implements node to its type.
 	 */
-	nodeDefinitions = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
+	nodeDefinitions = pagination.NewNodeDefinitions(pagination.NodeDefinitionsConfig{
 		IDFetcher: func(id string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error) {
 			// resolve id from global id
-			resolvedID := relay.FromGlobalID(id)
+			resolvedID := pagination.FromGlobalID(id)
 
 			// based on id and its type, return the object
 			switch resolvedID.Type {
@@ -143,7 +143,7 @@ func init() {
 		Name:        "Ship",
 		Description: "A ship in the Star Wars saga",
 		Fields: graphql.Fields{
-			"id": relay.GlobalIDField("Ship", nil),
+			"id": pagination.GlobalIDField("Ship", nil),
 			"name": &graphql.Field{
 				Type:        graphql.String,
 				Description: "The name of the ship.",
@@ -170,7 +170,7 @@ func init() {
 	 *     node: Ship
 	 *   }
 	 */
-	shipListDefinition := relay.ListDefinitions(relay.ListConfig{
+	shipListDefinition := pagination.ListDefinitions(pagination.ListConfig{
 		Name:     "Ship",
 		NodeType: shipType,
 	})
@@ -189,17 +189,17 @@ func init() {
 		Name:        "Faction",
 		Description: "A faction in the Star Wars saga",
 		Fields: graphql.Fields{
-			"id": relay.GlobalIDField("Faction", nil),
+			"id": pagination.GlobalIDField("Faction", nil),
 			"name": &graphql.Field{
 				Type:        graphql.String,
 				Description: "The name of the faction.",
 			},
 			"ships": &graphql.Field{
 				Type: shipListDefinition.ListType,
-				Args: relay.ListArgs,
+				Args: pagination.ListArgs,
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					// convert args map[string]interface into ListArguments
-					args := relay.NewListArguments(p.Args)
+					args := pagination.NewListArguments(p.Args)
 
 					// get ship objects from current faction
 					ships := []interface{}{}
@@ -211,7 +211,7 @@ func init() {
 					// let relay library figure out the result, given
 					// - the list of ships for this faction
 					// - and the filter arguments (i.e. first, last, after, before)
-					return relay.ListFromArray(ships, args), nil
+					return pagination.ListFromArray(ships, args), nil
 				},
 			},
 		},
@@ -267,7 +267,7 @@ func init() {
 	 *     faction: Faction
 	 *   }
 	 */
-	shipMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
+	shipMutation := pagination.MutationWithClientMutationID(pagination.MutationConfig{
 		Name: "IntroduceShip",
 		InputFields: graphql.InputObjectConfigFieldMap{
 			"shipName": &graphql.InputObjectFieldConfig{

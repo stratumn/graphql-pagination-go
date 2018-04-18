@@ -1,4 +1,4 @@
-# graphql-relay-go [![Build Status](https://semaphoreci.com/api/v1/stratumn/relay/branches/master/badge.svg)](https://semaphoreci.com/stratumn/relay)
+# graphql-relay-go [![Build Status](https://semaphoreci.com/api/v1/stratumn/graphql-pagination-go/branches/master/badge.svg)](https://semaphoreci.com/stratumn/graphql-pagination-go)
 
 This repository is a fork of https://github.com/graphql-go/relay
 
@@ -24,6 +24,6 @@ Source code for demo can be found at https://github.com/graphql-go/playground
 ### Test
 
 ```bash
-$ go get github.com/stratumn/relay
+$ go get github.com/stratumn/graphql-pagination-go
 $ go build && go test ./...
 ```
