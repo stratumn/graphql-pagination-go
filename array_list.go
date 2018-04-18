@@ -9,18 +9,17 @@ import (
 	"strings"
 )
 
-const PREFIX = "arraylist:"
+const prefix = "arraylist:"
 
 type ArraySliceMetaInfo struct {
 	SliceStart  int `json:"sliceStart"`
 	ArrayLength int `json:"arrayLength"`
 }
 
-/*
-A simple function that accepts an array and list arguments, and returns
-a list object for use in GraphQL. It uses array offsets as pagination,
-so pagination will only work if the array is static.
-*/
+// ListFromArray is described below
+// A simple function that accepts an array and list arguments, and returns
+// a list object for use in GraphQL. It uses array offsets as pagination,
+// so pagination will only work if the array is static.
 func ListFromArray(data []interface{}, args ListArguments) *List {
 	return ListFromArraySlice(
 		data,
@@ -32,15 +31,12 @@ func ListFromArray(data []interface{}, args ListArguments) *List {
 	)
 }
 
-/*
-Given a slice (subset) of an array, returns a list object for use in
-GraphQL.
-
-This function is similar to `ListFromArray`, but is intended for use
-cases where you know the cardinality of the list, consider it too large
-to materialize the entire array, and instead wish pass in a slice of the
-total result large enough to cover the range specified in `args`.
-*/
+// ListFromArraySlice Given a slice (subset) of an array, returns a list object for use in
+// GraphQL.
+// This function is similar to `ListFromArray`, but is intended for use
+// cases where you know the cardinality of the list, consider it too large
+// to materialize the entire array, and instead wish pass in a slice of the
+// total result large enough to cover the range specified in `args`.
 func ListFromArraySlice(
 	arraySlice []interface{},
 	args ListArguments,
@@ -70,18 +66,15 @@ func ListFromArraySlice(
 
 	slice := arraySlice[begin:end]
 
-	edges := []*Edge{}
+	items := make([]interface{}, len(slice))
 	for index, value := range slice {
-		edges = append(edges, &Edge{
-			Cursor: OffsetToCursor(startOffset + index),
-			Node:   value,
-		})
+		items[index] = value
 	}
 
 	var firstEdgeCursor, lastEdgeCursor ListCursor
-	if len(edges) > 0 {
-		firstEdgeCursor = edges[0].Cursor
-		lastEdgeCursor = edges[len(edges)-1:][0].Cursor
+	if len(items) > 0 {
+		firstEdgeCursor = OffsetToCursor(startOffset)
+		lastEdgeCursor = OffsetToCursor(startOffset + len(items) - 1)
 	}
 
 	lowerBound := 0
@@ -105,7 +98,7 @@ func ListFromArraySlice(
 	}
 
 	conn := NewList()
-	conn.Edges = edges
+	conn.Items = items
 	conn.PageInfo = PageInfo{
 		StartCursor:     firstEdgeCursor,
 		EndCursor:       lastEdgeCursor,
@@ -116,20 +109,20 @@ func ListFromArraySlice(
 	return conn
 }
 
-// Creates the cursor string from an offset
+// OffsetToCursor creates the cursor string from an offset
 func OffsetToCursor(offset int) ListCursor {
-	str := fmt.Sprintf("%v%v", PREFIX, offset)
+	str := fmt.Sprintf("%v%v", prefix, offset)
 	return ListCursor(base64.StdEncoding.EncodeToString([]byte(str)))
 }
 
-// Re-derives the offset from the cursor string.
+// CursorToOffset re-derives the offset from the cursor string.
 func CursorToOffset(cursor ListCursor) (int, error) {
 	str := ""
 	b, err := base64.StdEncoding.DecodeString(string(cursor))
 	if err == nil {
 		str = string(b)
 	}
-	str = strings.Replace(str, PREFIX, "", -1)
+	str = strings.Replace(str, prefix, "", -1)
 	offset, err := strconv.Atoi(str)
 	if err != nil {
 		return 0, errors.New("Invalid cursor")
@@ -137,7 +130,7 @@ func CursorToOffset(cursor ListCursor) (int, error) {
 	return offset, nil
 }
 
-// Return the cursor associated with an object in an array.
+// CursorForObjectInList returns the cursor associated with an object in an array.
 func CursorForObjectInList(data []interface{}, object interface{}) ListCursor {
 	offset := -1
 	for i, d := range data {
@@ -153,6 +146,7 @@ func CursorForObjectInList(data []interface{}, object interface{}) ListCursor {
 	return OffsetToCursor(offset)
 }
 
+// GetOffsetWithDefault extracts the offset of a cursor with a default value.
 func GetOffsetWithDefault(cursor ListCursor, defaultOffset int) int {
 	if cursor == "" {
 		return defaultOffset

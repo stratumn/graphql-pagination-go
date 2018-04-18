@@ -19,7 +19,7 @@ type PageInfo struct {
 type List struct {
 	Items      []interface{} `json:"items"`
 	PageInfo   PageInfo      `json:"pageInfo"`
-	TotalCount int           `json:"totalCount`
+	TotalCount int           `json:"totalCount"`
 }
 
 // NewList is a list constructor
