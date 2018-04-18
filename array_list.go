@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const prefix = "arraylist:"
+const prefix = "arrayconnection:"
 
 type ArraySliceMetaInfo struct {
 	SliceStart  int `json:"sliceStart"`
@@ -46,8 +46,8 @@ func ListFromArraySlice(
 	beforeOffset := GetOffsetWithDefault(args.Before, meta.ArrayLength)
 	afterOffset := GetOffsetWithDefault(args.After, -1)
 
-	startOffset := ternaryMax(meta.SliceStart-1, afterOffset, -1) + 1
-	endOffset := ternaryMin(sliceEnd, beforeOffset, meta.ArrayLength)
+	startOffset := max(meta.SliceStart-1, afterOffset, -1) + 1
+	endOffset := min(sliceEnd, beforeOffset, meta.ArrayLength)
 
 	if args.First != -1 {
 		endOffset = min(endOffset, startOffset+args.First)
@@ -105,6 +105,7 @@ func ListFromArraySlice(
 		HasPreviousPage: hasPreviousPage,
 		HasNextPage:     hasNextPage,
 	}
+	conn.TotalCount = len(arraySlice)
 
 	return conn
 }
@@ -158,24 +159,22 @@ func GetOffsetWithDefault(cursor ListCursor, defaultOffset int) int {
 	return offset
 }
 
-func max(a, b int) int {
-	if a < b {
-		return b
+func max(a int, b ...int) int {
+	ret := a
+	for _, i := range b {
+		if i > ret {
+			ret = i
+		}
 	}
-	return a
+	return ret
 }
 
-func ternaryMax(a, b, c int) int {
-	return max(max(a, b), c)
-}
-
-func min(a, b int) int {
-	if a > b {
-		return b
+func min(a int, b ...int) int {
+	ret := a
+	for _, i := range b {
+		if i < ret {
+			ret = i
+		}
 	}
-	return a
-}
-
-func ternaryMin(a, b, c int) int {
-	return min(min(a, b), c)
+	return ret
 }
