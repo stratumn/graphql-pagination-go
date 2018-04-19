@@ -11,14 +11,14 @@ import (
 
 const prefix = "arrayconnection:"
 
+// ArraySliceMetaInfo describes which part of array you want to work on.
 type ArraySliceMetaInfo struct {
 	SliceStart  int `json:"sliceStart"`
 	ArrayLength int `json:"arrayLength"`
 }
 
-// ListFromArray is described below
-// A simple function that accepts an array and list arguments, and returns
-// a list object for use in GraphQL. It uses array offsets as pagination,
+// ListFromArray is a simple function that accepts an array and list arguments,
+// and returns a list object for use in GraphQL. It uses array offsets as pagination,
 // so pagination will only work if the array is static.
 func ListFromArray(data []interface{}, args ListArguments) *List {
 	return ListFromArraySlice(
@@ -31,8 +31,8 @@ func ListFromArray(data []interface{}, args ListArguments) *List {
 	)
 }
 
-// ListFromArraySlice Given a slice (subset) of an array, returns a list object for use in
-// GraphQL.
+// ListFromArraySlice returns a list object for use in GraphQL, given a slice
+// (subset) of an array.
 // This function is similar to `ListFromArray`, but is intended for use
 // cases where you know the cardinality of the list, consider it too large
 // to materialize the entire array, and instead wish pass in a slice of the
@@ -71,10 +71,10 @@ func ListFromArraySlice(
 		items[index] = value
 	}
 
-	var firstEdgeCursor, lastEdgeCursor ListCursor
+	var firstItemCursor, lastItemCursor ListCursor
 	if len(items) > 0 {
-		firstEdgeCursor = OffsetToCursor(startOffset)
-		lastEdgeCursor = OffsetToCursor(startOffset + len(items) - 1)
+		firstItemCursor = OffsetToCursor(startOffset)
+		lastItemCursor = OffsetToCursor(startOffset + len(items) - 1)
 	}
 
 	lowerBound := 0
@@ -100,8 +100,8 @@ func ListFromArraySlice(
 	conn := NewList()
 	conn.Items = items
 	conn.PageInfo = PageInfo{
-		StartCursor:     firstEdgeCursor,
-		EndCursor:       lastEdgeCursor,
+		StartCursor:     firstItemCursor,
+		EndCursor:       lastItemCursor,
 		HasPreviousPage: hasPreviousPage,
 		HasNextPage:     hasNextPage,
 	}

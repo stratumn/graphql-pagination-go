@@ -6,22 +6,19 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+// MutationFn mutates and returns the payload
 type MutationFn func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error)
 
-/*
-A description of a mutation consumable by mutationWithClientMutationId
-to create a GraphQLField for that mutation.
-
-The inputFields and outputFields should not include `clientMutationId`,
-as this will be provided automatically.
-
-An input object will be created containing the input fields, and an
-object will be created containing the output fields.
-
-mutateAndGetPayload will receive an Object with a key for each
-input field, and it should return an Object with a key for each
-output field. It may return synchronously, or return a Promise.
-*/
+// MutationConfig description below
+// A description of a mutation consumable by mutationWithClientMutationId
+// to create a GraphQLField for that mutation.
+// The inputFields and outputFields should not include `clientMutationId`,
+// as this will be provided automatically.
+// An input object will be created containing the input fields, and an
+// object will be created containing the output fields.
+// mutateAndGetPayload will receive an Object with a key for each
+// input field, and it should return an Object with a key for each
+// output field. It may return synchronously, or return a Promise.
 type MutationConfig struct {
 	Name                string                            `json:"name"`
 	InputFields         graphql.InputObjectConfigFieldMap `json:"inputFields"`
@@ -29,11 +26,8 @@ type MutationConfig struct {
 	MutateAndGetPayload MutationFn                        `json:"mutateAndGetPayload"`
 }
 
-/*
-Returns a GraphQLField for the mutation described by the
-provided MutationConfig.
-*/
-
+// MutationWithClientMutationID returns a GraphQLField for the mutation described by the
+// provided MutationConfig.
 func MutationWithClientMutationID(config MutationConfig) *graphql.Field {
 
 	augmentedInputFields := config.InputFields

@@ -350,7 +350,7 @@ func TestListFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_ExactlyRi
 	assert.EqualValues(t, expected, result)
 }
 
-func TestListFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfFirstIsZero(t *testing.T) {
+func TestListFromArray_HandlesCursorItemCases_ReturnsNoElementsIfFirstIsZero(t *testing.T) {
 	filter := map[string]interface{}{
 		"first": 0,
 	}
@@ -369,7 +369,7 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfFirstIsZero(t *
 	assert.EqualValues(t, expected, result)
 }
 
-func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreInvalid(t *testing.T) {
+func TestListFromArray_HandlesCursorItemCases_ReturnsAllElementsIfCursorsAreInvalid(t *testing.T) {
 	filter := map[string]interface{}{
 		"before": "invalid",
 		"after":  "invalid",
@@ -391,7 +391,7 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreInva
 	assert.EqualValues(t, expected, result)
 }
 
-func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreOnTheOutside(t *testing.T) {
+func TestListFromArray_HandlesCursorItemCases_ReturnsAllElementsIfCursorsAreOnTheOutside(t *testing.T) {
 	filter := map[string]interface{}{
 		"before": "YXJyYXljb25uZWN0aW9uOjYK",     // ==> offset: int(6)
 		"after":  "YXJyYXljb25uZWN0aW9uOi0xCg==", // ==> offset: int(-1)
@@ -413,7 +413,7 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsAreOnTh
 	assert.EqualValues(t, expected, result)
 }
 
-func TestListFromArray_HandlesCursorEdgeCases_ReturnsNullIfCursorsIsConsecutive(t *testing.T) {
+func TestListFromArray_HandlesCursorItemCases_ReturnsNullIfCursorsIsConsecutive(t *testing.T) {
 	filter := map[string]interface{}{
 		"before": "YXJyYXljb25uZWN0aW9uOjM=", // ==> offset: int(3)
 		"after":  "YXJyYXljb25uZWN0aW9uOjI=", // ==> offset: int(2)
@@ -430,7 +430,7 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsNullIfCursorsIsConsecutive(
 	assert.EqualValues(t, expected, result)
 }
 
-func TestListFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfCursorsCross(t *testing.T) {
+func TestListFromArray_HandlesCursorItemCases_ReturnsNoElementsIfCursorsCross(t *testing.T) {
 	filter := map[string]interface{}{
 		"before": "YXJyYXljb25uZWN0aW9uOjI=", // ==> offset: int(2)
 		"after":  "YXJyYXljb25uZWN0aW9uOjQ=", // ==> offset: int(4)
@@ -447,7 +447,7 @@ func TestListFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfCursorsCross(t 
 	assert.EqualValues(t, expected, result)
 }
 
-func TestListFromArray_CursorForObjectInList_ReturnsAnEdgeCursor_GivenAnArrayAndAMemberObject(t *testing.T) {
+func TestListFromArray_CursorForObjectInList_ReturnsAnItemCursor_GivenAnArrayAndAMemberObject(t *testing.T) {
 	letterBCursor := pagination.CursorForObjectInList(arrayListTestLetters, "B")
 	expected := pagination.ListCursor("YXJyYXljb25uZWN0aW9uOjE=")
 	assert.EqualValues(t, expected, letterBCursor)

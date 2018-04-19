@@ -34,7 +34,7 @@ func init() {
 
 	listTestListDef = pagination.ListDefinitions(pagination.ListConfig{
 		Name:     "Friend",
-		NodeType: listTestUserType,
+		ItemType: listTestUserType,
 		ListFields: graphql.Fields{
 			"totalMaleCount": &graphql.Field{
 				Type: graphql.Int,
@@ -77,7 +77,7 @@ func init() {
 
 }
 
-func TestListDefinition_IncludesListAndEdgeFields(t *testing.T) {
+func TestListDefinition_IncludesListAndItemFields(t *testing.T) {
 	query := `
       query FriendsQuery {
         user {

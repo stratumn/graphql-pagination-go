@@ -27,16 +27,14 @@ func NewListArgs(configMap graphql.FieldConfigArgument) graphql.FieldConfigArgum
 	return configMap
 }
 
+// ListConfig is the configuration object for list
 type ListConfig struct {
 	Name       string          `json:"name"`
-	NodeType   *graphql.Object `json:"nodeType"`
+	ItemType   *graphql.Object `json:"itemType"`
 	ListFields graphql.Fields  `json:"listFields"`
 }
 
-type EdgeType struct {
-	Node   interface{} `json:"node"`
-	Cursor ListCursor  `json:"cursor"`
-}
+// GraphQLListDefinitions is the GraphQL object type for a list
 type GraphQLListDefinitions struct {
 	ListType *graphql.Object `json:"listType"`
 }
@@ -68,7 +66,7 @@ var pageInfoType = graphql.NewObject(graphql.ObjectConfig{
 })
 
 // ListDefinitions returns a GraphQLObjectType for a list with the given name,
-// and whose nodes are of the specified type.
+// and whose items are of the specified type.
 func ListDefinitions(config ListConfig) *GraphQLListDefinitions {
 
 	listType := graphql.NewObject(graphql.ObjectConfig{
@@ -77,7 +75,7 @@ func ListDefinitions(config ListConfig) *GraphQLListDefinitions {
 
 		Fields: graphql.Fields{
 			"items": &graphql.Field{
-				Type:        graphql.NewList(config.NodeType),
+				Type:        graphql.NewList(config.ItemType),
 				Description: "Items of the list.",
 			},
 			"pageInfo": &graphql.Field{

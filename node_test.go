@@ -24,53 +24,53 @@ type photo struct {
 	Width int `json:"width"`
 }
 
-var nodeTestUserData = map[string]*user{
+var ItemTestUserData = map[string]*user{
 	"1": &user{1, "John Doe"},
 	"2": &user{2, "Jane Smith"},
 }
-var nodeTestPhotoData = map[string]*photo{
+var ItemTestPhotoData = map[string]*photo{
 	"3": &photo{3, 300},
 	"4": &photo{4, 400},
 }
 
 // declare types first, define later in init()
-// because they all depend on nodeTestDef
-var nodeTestUserType *graphql.Object
-var nodeTestPhotoType *graphql.Object
+// because they all depend on ItemTestDef
+var ItemTestUserType *graphql.Object
+var ItemTestPhotoType *graphql.Object
 
-var nodeTestDef = pagination.NewNodeDefinitions(pagination.NodeDefinitionsConfig{
+var ItemTestDef = pagination.NewItemDefinitions(pagination.ItemDefinitionsConfig{
 	IDFetcher: func(id string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error) {
-		if user, ok := nodeTestUserData[id]; ok {
+		if user, ok := ItemTestUserData[id]; ok {
 			return user, nil
 		}
-		if photo, ok := nodeTestPhotoData[id]; ok {
+		if photo, ok := ItemTestPhotoData[id]; ok {
 			return photo, nil
 		}
-		return nil, errors.New("Unknown node")
+		return nil, errors.New("Unknown Item")
 	},
 	TypeResolve: func(p graphql.ResolveTypeParams) *graphql.Object {
 		switch p.Value.(type) {
 		case *user:
-			return nodeTestUserType
+			return ItemTestUserType
 		case *photo:
-			return nodeTestPhotoType
+			return ItemTestPhotoType
 		default:
 			panic(fmt.Sprintf("Unknown object type `%v`", p.Value))
 		}
 	},
 })
-var nodeTestQueryType = graphql.NewObject(graphql.ObjectConfig{
+var ItemTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
 	Fields: graphql.Fields{
-		"node": nodeTestDef.NodeField,
+		"Item": ItemTestDef.ItemField,
 	},
 })
 
-// be careful not to define schema here, since nodeTestUserType and nodeTestPhotoType wouldn't be defined till init()
-var nodeTestSchema graphql.Schema
+// be careful not to define schema here, since ItemTestUserType and ItemTestPhotoType wouldn't be defined till init()
+var ItemTestSchema graphql.Schema
 
 func init() {
-	nodeTestUserType = graphql.NewObject(graphql.ObjectConfig{
+	ItemTestUserType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "User",
 		Fields: graphql.Fields{
 			"id": &graphql.Field{
@@ -80,9 +80,9 @@ func init() {
 				Type: graphql.String,
 			},
 		},
-		Interfaces: []*graphql.Interface{nodeTestDef.NodeInterface},
+		Interfaces: []*graphql.Interface{ItemTestDef.ItemInterface},
 	})
-	nodeTestPhotoType = graphql.NewObject(graphql.ObjectConfig{
+	ItemTestPhotoType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Photo",
 		Fields: graphql.Fields{
 			"id": &graphql.Field{
@@ -92,59 +92,59 @@ func init() {
 				Type: graphql.Int,
 			},
 		},
-		Interfaces: []*graphql.Interface{nodeTestDef.NodeInterface},
+		Interfaces: []*graphql.Interface{ItemTestDef.ItemInterface},
 	})
 
-	nodeTestSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
-		Query: nodeTestQueryType,
-		Types: []graphql.Type{nodeTestUserType, nodeTestPhotoType},
+	ItemTestSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
+		Query: ItemTestQueryType,
+		Types: []graphql.Type{ItemTestUserType, ItemTestPhotoType},
 	})
 }
-func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForUsers(t *testing.T) {
+func TestItemInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForUsers(t *testing.T) {
 	query := `{
-        node(id: "1") {
+        Item(id: "1") {
           id
         }
       }`
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": map[string]interface{}{
+			"Item": map[string]interface{}{
 				"id": "1",
 			},
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        nodeTestSchema,
+		Schema:        ItemTestSchema,
 		RequestString: query,
 	})
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForPhotos(t *testing.T) {
+func TestItemInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForPhotos(t *testing.T) {
 	query := `{
-        node(id: "4") {
+        Item(id: "4") {
           id
         }
       }`
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": map[string]interface{}{
+			"Item": map[string]interface{}{
 				"id": "4",
 			},
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        nodeTestSchema,
+		Schema:        ItemTestSchema,
 		RequestString: query,
 	})
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectNameForUsers(t *testing.T) {
+func TestItemInterfaceAndFields_AllowsRefetching_GetsTheCorrectNameForUsers(t *testing.T) {
 	query := `{
-        node(id: "1") {
+        Item(id: "1") {
           id
           ... on User {
             name
@@ -153,23 +153,23 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectNameForUsers(t *t
       }`
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": map[string]interface{}{
+			"Item": map[string]interface{}{
 				"id":   "1",
 				"name": "John Doe",
 			},
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        nodeTestSchema,
+		Schema:        ItemTestSchema,
 		RequestString: query,
 	})
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectWidthForPhotos(t *testing.T) {
+func TestItemInterfaceAndFields_AllowsRefetching_GetsTheCorrectWidthForPhotos(t *testing.T) {
 	query := `{
-        node(id: "4") {
+        Item(id: "4") {
           id
           ... on Photo {
             width
@@ -178,69 +178,69 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectWidthForPhotos(t 
       }`
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": map[string]interface{}{
+			"Item": map[string]interface{}{
 				"id":    "4",
 				"width": 400,
 			},
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        nodeTestSchema,
+		Schema:        ItemTestSchema,
 		RequestString: query,
 	})
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForUsers(t *testing.T) {
+func TestItemInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForUsers(t *testing.T) {
 	query := `{
-        node(id: "1") {
+        Item(id: "1") {
           id
           __typename
         }
       }`
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": map[string]interface{}{
+			"Item": map[string]interface{}{
 				"id":         "1",
 				"__typename": "User",
 			},
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        nodeTestSchema,
+		Schema:        ItemTestSchema,
 		RequestString: query,
 	})
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForPhotos(t *testing.T) {
+func TestItemInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForPhotos(t *testing.T) {
 	query := `{
-        node(id: "4") {
+        Item(id: "4") {
           id
           __typename
         }
       }`
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": map[string]interface{}{
+			"Item": map[string]interface{}{
 				"id":         "4",
 				"__typename": "Photo",
 			},
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        nodeTestSchema,
+		Schema:        ItemTestSchema,
 		RequestString: query,
 	})
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestNodeInterfaceAndFields_AllowsRefetching_IgnoresPhotoFragmentsOnUser(t *testing.T) {
+func TestItemInterfaceAndFields_AllowsRefetching_IgnoresPhotoFragmentsOnUser(t *testing.T) {
 	query := `{
-        node(id: "1") {
+        Item(id: "1") {
           id
           ... on Photo {
             width
@@ -249,38 +249,38 @@ func TestNodeInterfaceAndFields_AllowsRefetching_IgnoresPhotoFragmentsOnUser(t *
       }`
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": map[string]interface{}{
+			"Item": map[string]interface{}{
 				"id": "1",
 			},
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        nodeTestSchema,
+		Schema:        ItemTestSchema,
 		RequestString: query,
 	})
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestNodeInterfaceAndFields_AllowsRefetching_ReturnsNullForBadIDs(t *testing.T) {
+func TestItemInterfaceAndFields_AllowsRefetching_ReturnsNullForBadIDs(t *testing.T) {
 	query := `{
-        node(id: "5") {
+        Item(id: "5") {
           id
         }
       }`
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": nil,
+			"Item": nil,
 		},
 		Errors: []gqlerrors.FormattedError{
 			{
-				Message:   "Unknown node",
+				Message:   "Unknown Item",
 				Locations: []location.SourceLocation{},
 			},
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        nodeTestSchema,
+		Schema:        ItemTestSchema,
 		RequestString: query,
 	})
 
@@ -288,9 +288,9 @@ func TestNodeInterfaceAndFields_AllowsRefetching_ReturnsNullForBadIDs(t *testing
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeInterface(t *testing.T) {
+func TestItemInterfaceAndFields_CorrectlyIntrospects_HasCorrectItemInterface(t *testing.T) {
 	query := `{
-        __type(name: "Node") {
+        __type(name: "Item") {
           name
           kind
           fields {
@@ -308,7 +308,7 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeInterface(t *
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"__type": map[string]interface{}{
-				"name": "Node",
+				"name": "Item",
 				"kind": "INTERFACE",
 				"fields": []interface{}{
 					map[string]interface{}{
@@ -326,14 +326,14 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeInterface(t *
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        nodeTestSchema,
+		Schema:        ItemTestSchema,
 		RequestString: query,
 	})
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
-func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeRootField(t *testing.T) {
+func TestItemInterfaceAndFields_CorrectlyIntrospects_HasCorrectItemRootField(t *testing.T) {
 	query := `{
         __schema {
           queryType {
@@ -363,9 +363,9 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeRootField(t *
 				"queryType": map[string]interface{}{
 					"fields": []interface{}{
 						map[string]interface{}{
-							"name": "node",
+							"name": "Item",
 							"type": map[string]interface{}{
-								"name": "Node",
+								"name": "Item",
 								"kind": "INTERFACE",
 							},
 							"args": []interface{}{
@@ -387,7 +387,7 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeRootField(t *
 		},
 	}
 	result := graphql.Do(graphql.Params{
-		Schema:        nodeTestSchema,
+		Schema:        ItemTestSchema,
 		RequestString: query,
 	})
 	if !reflect.DeepEqual(result, expected) {

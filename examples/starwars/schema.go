@@ -29,29 +29,24 @@ import (
  * Using our shorthand to describe type systems, the type system for our
  * example will be the following:
  *
- * interface Node {
+ * interface Item {
  *   id: ID!
  * }
  *
- * type Faction : Node {
+ * type Faction : Item {
  *   id: ID!
  *   name: String
  *   ships: ShipList
  * }
  *
- * type Ship : Node {
+ * type Ship : Item {
  *   id: ID!
  *   name: String
  * }
  *
  * type ShipList {
- *   edges: [ShipEdge]
+ *   items: [Ship]
  *   pageInfo: PageInfo!
- * }
- *
- * type ShipEdge {
- *   cursor: String!
- *   node: Ship
  * }
  *
  * type PageInfo {
@@ -64,7 +59,7 @@ import (
  * type Query {
  *   rebels: Faction
  *   empire: Faction
- *   node(id: ID!): Node
+ *   item(id: ID!): Item
  * }
  *
  * input IntroduceShipInput {
@@ -86,26 +81,26 @@ import (
 
 // declare definitions first, and initialize them in init() to break `initialization loop`
 // i.e.:
-// - nodeDefinitions refers to
+// - itemDefinitions refers to
 // - shipType refers to
-// - nodeDefinitions
+// - itemDefinitions
 
-var nodeDefinitions *pagination.NodeDefinitions
+var itemDefinitions *pagination.ItemDefinitions
 var shipType *graphql.Object
 var factionType *graphql.Object
 
-// exported schema, defined in init()
+// Schema is the exported schema, defined in init()
 var Schema graphql.Schema
 
 func init() {
 
 	/**
-	 * We get the node interface and field from the relay library.
+	 * We get the item interface and field from the relay library.
 	 *
 	 * The first method is the way we resolve an ID to its object. The second is the
-	 * way we resolve an object that implements node to its type.
+	 * way we resolve an object that implements item to its type.
 	 */
-	nodeDefinitions = pagination.NewNodeDefinitions(pagination.NodeDefinitionsConfig{
+	itemDefinitions = pagination.NewItemDefinitions(pagination.ItemDefinitionsConfig{
 		IDFetcher: func(id string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error) {
 			// resolve id from global id
 			resolvedID := pagination.FromGlobalID(id)
@@ -117,7 +112,7 @@ func init() {
 			case "Ship":
 				return GetShip(resolvedID.ID), nil
 			default:
-				return nil, errors.New("Unknown node type")
+				return nil, errors.New("Unknown item type")
 			}
 		},
 		TypeResolve: func(p graphql.ResolveTypeParams) *graphql.Object {
@@ -135,7 +130,7 @@ func init() {
 	 * We define our basic ship type.
 	 *
 	 * This implements the following type system shorthand:
-	 *   type Ship : Node {
+	 *   type Ship : Item {
 	 *     id: String!
 	 *     name: String
 	 *   }
@@ -151,7 +146,7 @@ func init() {
 			},
 		},
 		Interfaces: []*graphql.Interface{
-			nodeDefinitions.NodeInterface,
+			itemDefinitions.ItemInterface,
 		},
 	})
 
@@ -160,27 +155,20 @@ func init() {
 	 *
 	 * listType implements the following type system shorthand:
 	 *   type ShipList {
-	 *     edges: [ShipEdge]
+	 *     items: [Ship]
 	 *     pageInfo: PageInfo!
-	 *   }
-	 *
-	 * listType has an edges field - a list of edgeTypes that implement the
-	 * following type system shorthand:
-	 *   type ShipEdge {
-	 *     cursor: String!
-	 *     node: Ship
 	 *   }
 	 */
 	shipListDefinition := pagination.ListDefinitions(pagination.ListConfig{
 		Name:     "Ship",
-		NodeType: shipType,
+		ItemType: shipType,
 	})
 
 	/**
-	 * We define our faction type, which implements the node interface.
+	 * We define our faction type, which implements the item interface.
 	 *
 	 * This implements the following type system shorthand:
-	 *   type Faction : Node {
+	 *   type Faction : Item {
 	 *     id: String!
 	 *     name: String
 	 *     ships: ShipList
@@ -205,8 +193,8 @@ func init() {
 					// get ship objects from current faction
 					ships := []interface{}{}
 					if faction, ok := p.Source.(*Faction); ok {
-						for _, shipId := range faction.Ships {
-							ships = append(ships, GetShip(shipId))
+						for _, shipID := range faction.Ships {
+							ships = append(ships, GetShip(shipID))
 						}
 					}
 					// let relay library figure out the result, given
@@ -217,7 +205,7 @@ func init() {
 			},
 		},
 		Interfaces: []*graphql.Interface{
-			nodeDefinitions.NodeInterface,
+			itemDefinitions.ItemInterface,
 		},
 	})
 
@@ -229,7 +217,7 @@ func init() {
 	 *   type Query {
 	 *     rebels: Faction
 	 *     empire: Faction
-	 *     node(id: String!): Node
+	 *     item(id: String!): Item
 	 *   }
 	 */
 	queryType := graphql.NewObject(graphql.ObjectConfig{
@@ -247,7 +235,7 @@ func init() {
 					return GetEmpire(), nil
 				},
 			},
-			"node": nodeDefinitions.NodeField,
+			"item": itemDefinitions.ItemField,
 		},
 	})
 
@@ -302,14 +290,14 @@ func init() {
 			// `inputMap` is a map with keys/fields as specified in `InputFields`
 			// Note, that these fields were specified as non-nullables, so we can assume that it exists.
 			shipName := inputMap["shipName"].(string)
-			factionId := inputMap["factionId"].(string)
+			factionID := inputMap["factionId"].(string)
 
 			// This mutation involves us creating (introducing) a new ship
-			newShip := CreateShip(shipName, factionId)
+			newShip := CreateShip(shipName, factionID)
 			// return payload
 			return map[string]interface{}{
 				"shipId":    newShip.ID,
-				"factionId": factionId,
+				"factionId": factionID,
 			}, nil
 		},
 	})

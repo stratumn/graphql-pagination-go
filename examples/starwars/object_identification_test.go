@@ -37,7 +37,7 @@ func TestObjectIdentification_TestFetching_CorrectlyFetchesTheIDAndTheNameOfTheR
 func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheRebels(t *testing.T) {
 	query := `
         query RebelsRefetchQuery {
-          node(id: "RmFjdGlvbjox") {
+          item(id: "RmFjdGlvbjox") {
             id
             ... on Faction {
               name
@@ -47,7 +47,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheRebels(t *testin
       `
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": map[string]interface{}{
+			"item": map[string]interface{}{
 				"id":   "RmFjdGlvbjox",
 				"name": "Alliance to Restore the Republic",
 			},
@@ -89,7 +89,7 @@ func TestObjectIdentification_TestFetching_CorrectlyFetchesTheIDAndTheNameOfTheE
 func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheEmpire(t *testing.T) {
 	query := `
         query EmpireRefetchQuery {
-          node(id: "RmFjdGlvbjoy") {
+          item(id: "RmFjdGlvbjoy") {
             id
             ... on Faction {
               name
@@ -99,7 +99,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheEmpire(t *testin
       `
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": map[string]interface{}{
+			"item": map[string]interface{}{
 				"id":   "RmFjdGlvbjoy",
 				"name": "Galactic Empire",
 			},
@@ -116,7 +116,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheEmpire(t *testin
 func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheXWing(t *testing.T) {
 	query := `
         query XWingRefetchQuery {
-          node(id: "U2hpcDox") {
+          item(id: "U2hpcDox") {
             id
             ... on Ship {
               name
@@ -126,7 +126,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheXWing(t *testing
       `
 	expected := &graphql.Result{
 		Data: map[string]interface{}{
-			"node": map[string]interface{}{
+			"item": map[string]interface{}{
 				"id":   "U2hpcDox",
 				"name": "X-Wing",
 			},
