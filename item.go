@@ -1,39 +1,44 @@
-package relay
+package pagination
 
 import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/graphql-go/graphql"
-	"golang.org/x/net/context"
 	"strings"
+
+	"context"
+
+	"github.com/graphql-go/graphql"
 )
 
-type NodeDefinitions struct {
-	NodeInterface *graphql.Interface
-	NodeField     *graphql.Field
+// ItemDefinitions is the GraphQL object type for an item list
+type ItemDefinitions struct {
+	ItemInterface *graphql.Interface
+	ItemField     *graphql.Field
 }
 
-type NodeDefinitionsConfig struct {
+// ItemDefinitionsConfig is the configuration object for item list
+type ItemDefinitionsConfig struct {
 	IDFetcher   IDFetcherFn
 	TypeResolve graphql.ResolveTypeFn
 }
+
+// IDFetcherFn returns the the object from an id
 type IDFetcherFn func(id string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error)
+
+// GlobalIDFetcherFn returns the id of an object
 type GlobalIDFetcherFn func(obj interface{}, info graphql.ResolveInfo, ctx context.Context) (string, error)
 
-/*
- Given a function to map from an ID to an underlying object, and a function
- to map from an underlying object to the concrete GraphQLObjectType it
- corresponds to, constructs a `Node` interface that objects can implement,
- and a field config for a `node` root field.
-
- If the typeResolver is omitted, object resolution on the interface will be
- handled with the `isTypeOf` method on object types, as with any GraphQL
-interface without a provided `resolveType` method.
-*/
-func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
-	nodeInterface := graphql.NewInterface(graphql.InterfaceConfig{
-		Name:        "Node",
+// NewItemDefinitions constructs a `Item` interface that objects can implement,
+// and a field config for a `Item` root field, given a function to map from an
+// ID to an underlying object, and a function to map from an underlying object
+// to the concrete GraphQLObjectType it corresponds to.
+// If the typeResolver is omitted, object resolution on the interface will be
+// handled with the `isTypeOf` method on object types, as with any GraphQL
+// interface without a provided `resolveType` method.
+func NewItemDefinitions(config ItemDefinitionsConfig) *ItemDefinitions {
+	ItemInterface := graphql.NewInterface(graphql.InterfaceConfig{
+		Name:        "Item",
 		Description: "An object with an ID",
 		Fields: graphql.Fields{
 			"id": &graphql.Field{
@@ -44,10 +49,10 @@ func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
 		ResolveType: config.TypeResolve,
 	})
 
-	nodeField := &graphql.Field{
-		Name:        "Node",
+	ItemField := &graphql.Field{
+		Name:        "Item",
 		Description: "Fetches an object given its ID",
-		Type:        nodeInterface,
+		Type:        ItemInterface,
 		Args: graphql.FieldConfigArgument{
 			"id": &graphql.ArgumentConfig{
 				Type:        graphql.NewNonNull(graphql.ID),
@@ -65,31 +70,28 @@ func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
 			return config.IDFetcher(id, p.Info, p.Context)
 		},
 	}
-	return &NodeDefinitions{
-		NodeInterface: nodeInterface,
-		NodeField:     nodeField,
+	return &ItemDefinitions{
+		ItemInterface: ItemInterface,
+		ItemField:     ItemField,
 	}
 }
 
+// ResolvedGlobalID is the type and id of an object
 type ResolvedGlobalID struct {
 	Type string `json:"type"`
 	ID   string `json:"id"`
 }
 
-/*
-Takes a type name and an ID specific to that type name, and returns a
-"global ID" that is unique among all types.
-*/
+// ToGlobalID takes a type name and an ID specific to that type name, and returns a
+// "global ID" that is unique among all types.
 func ToGlobalID(ttype string, id string) string {
 	str := ttype + ":" + id
 	encStr := base64.StdEncoding.EncodeToString([]byte(str))
 	return encStr
 }
 
-/*
-Takes the "global ID" created by toGlobalID, and returns the type name and ID
-used to create it.
-*/
+// FromGlobalID takes the "global ID" created by toGlobalID, and returns the type name and ID
+// used to create it.
 func FromGlobalID(globalID string) *ResolvedGlobalID {
 	strID := ""
 	b, err := base64.StdEncoding.DecodeString(globalID)
@@ -106,12 +108,10 @@ func FromGlobalID(globalID string) *ResolvedGlobalID {
 	}
 }
 
-/*
-Creates the configuration for an id field on a node, using `toGlobalId` to
-construct the ID from the provided typename. The type-specific ID is fetcher
-by calling idFetcher on the object, or if not provided, by accessing the `id`
-property on the object.
-*/
+// GlobalIDField creates the configuration for an id field on a Item, using `toGlobalId` to
+// construct the ID from the provided typename. The type-specific ID is fetcher
+// by calling idFetcher on the object, or if not provided, by accessing the `id`
+// property on the object.
 func GlobalIDField(typeName string, idFetcher GlobalIDFetcherFn) *graphql.Field {
 	return &graphql.Field{
 		Name:        "id",

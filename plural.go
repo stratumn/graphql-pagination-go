@@ -1,10 +1,13 @@
-package relay
+package pagination
 
 import (
 	"github.com/graphql-go/graphql"
 )
 
+// ResolveSingleInputFn is ...
 type ResolveSingleInputFn func(input interface{}) interface{}
+
+// PluralIdentifyingRootFieldConfig is ...
 type PluralIdentifyingRootFieldConfig struct {
 	ArgName            string               `json:"argName"`
 	InputType          graphql.Input        `json:"inputType"`
@@ -13,6 +16,7 @@ type PluralIdentifyingRootFieldConfig struct {
 	Description        string               `json:"description"`
 }
 
+// PluralIdentifyingRootField is ...
 func PluralIdentifyingRootField(config PluralIdentifyingRootFieldConfig) *graphql.Field {
 	inputArgs := graphql.FieldConfigArgument{}
 	if config.ArgName != "" {

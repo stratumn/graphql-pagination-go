@@ -1,4 +1,4 @@
-package relay_test
+package pagination_test
 
 import (
 	"errors"
@@ -6,10 +6,11 @@ import (
 	"reflect"
 	"testing"
 
+	"context"
+
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
-	"github.com/graphql-go/relay"
-	"golang.org/x/net/context"
+	pagination "github.com/stratumn/graphql-pagination-go"
 )
 
 type photo2 struct {
@@ -27,15 +28,15 @@ var globalIDTestPhotoData = map[string]*photo2{
 }
 
 // declare types first, define later in init()
-// because they all depend on nodeTestDef
+// because they all depend on ItemTestDef
 var globalIDTestUserType *graphql.Object
 var globalIDTestPhotoType *graphql.Object
 
-var globalIDTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
+var globalIDTestDef = pagination.NewItemDefinitions(pagination.ItemDefinitionsConfig{
 	IDFetcher: func(globalID string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error) {
-		resolvedGlobalID := relay.FromGlobalID(globalID)
+		resolvedGlobalID := pagination.FromGlobalID(globalID)
 		if resolvedGlobalID == nil {
-			return nil, errors.New("Unknown node id")
+			return nil, errors.New("Unknown Item id")
 		}
 
 		switch resolvedGlobalID.Type {
@@ -44,7 +45,7 @@ var globalIDTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
 		case "Photo":
 			return globalIDTestPhotoData[resolvedGlobalID.ID], nil
 		default:
-			return nil, errors.New("Unknown node type")
+			return nil, errors.New("Unknown Item type")
 		}
 	},
 	TypeResolve: func(p graphql.ResolveTypeParams) *graphql.Object {
@@ -61,9 +62,9 @@ var globalIDTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
 var globalIDTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
 	Fields: graphql.Fields{
-		"node": globalIDTestDef.NodeField,
+		"Item": globalIDTestDef.ItemField,
 		"allObjects": &graphql.Field{
-			Type: graphql.NewList(globalIDTestDef.NodeInterface),
+			Type: graphql.NewList(globalIDTestDef.ItemInterface),
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				return []interface{}{
 					globalIDTestUserData["1"],
@@ -83,12 +84,12 @@ func init() {
 	globalIDTestUserType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "User",
 		Fields: graphql.Fields{
-			"id": relay.GlobalIDField("User", nil),
+			"id": pagination.GlobalIDField("User", nil),
 			"name": &graphql.Field{
 				Type: graphql.String,
 			},
 		},
-		Interfaces: []*graphql.Interface{globalIDTestDef.NodeInterface},
+		Interfaces: []*graphql.Interface{globalIDTestDef.ItemInterface},
 	})
 	photoIDFetcher := func(obj interface{}, info graphql.ResolveInfo, ctx context.Context) (string, error) {
 		switch obj := obj.(type) {
@@ -100,12 +101,12 @@ func init() {
 	globalIDTestPhotoType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Photo",
 		Fields: graphql.Fields{
-			"id": relay.GlobalIDField("Photo", photoIDFetcher),
+			"id": pagination.GlobalIDField("Photo", photoIDFetcher),
 			"width": &graphql.Field{
 				Type: graphql.Int,
 			},
 		},
-		Interfaces: []*graphql.Interface{globalIDTestDef.NodeInterface},
+		Interfaces: []*graphql.Interface{globalIDTestDef.ItemInterface},
 	})
 
 	globalIDTestSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
@@ -149,13 +150,13 @@ func TestGlobalIDFields_GivesDifferentIDs(t *testing.T) {
 
 func TestGlobalIDFields_RefetchesTheIDs(t *testing.T) {
 	query := `{
-      user: node(id: "VXNlcjox") {
+      user: Item(id: "VXNlcjox") {
         id
         ... on User {
           name
         }
       },
-      photo: node(id: "UGhvdG86MQ==") {
+      photo: Item(id: "UGhvdG86MQ==") {
         id
         ... on Photo {
           width

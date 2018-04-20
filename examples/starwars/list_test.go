@@ -1,24 +1,23 @@
 package starwars_test
 
 import (
-	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql/testutil"
-	"github.com/graphql-go/relay/examples/starwars"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/graphql-go/graphql"
+	"github.com/stratumn/graphql-pagination-go/examples/starwars"
 )
 
-func TestConnection_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *testing.T) {
+func TestList_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *testing.T) {
 	query := `
         query RebelsShipsQuery {
           rebels {
             name,
             ships(first: 1) {
-              edges {
-                node {
-                  name
-                }
-              }
+							items {
+								name
+							}
             }
           }
         }
@@ -28,11 +27,9 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *test
 			"rebels": map[string]interface{}{
 				"name": "Alliance to Restore the Republic",
 				"ships": map[string]interface{}{
-					"edges": []interface{}{
+					"items": []interface{}{
 						map[string]interface{}{
-							"node": map[string]interface{}{
-								"name": "X-Wing",
-							},
+							"name": "X-Wing",
 						},
 					},
 				},
@@ -43,21 +40,17 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *test
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
-func TestConnection_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebelsWithACursor(t *testing.T) {
+
+func TestList_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebels(t *testing.T) {
 	query := `
         query MoreRebelShipsQuery {
           rebels {
             name,
             ships(first: 2) {
-              edges {
-                cursor,
-                node {
-                  name
-                }
+              items {
+                name
               }
             }
           }
@@ -68,18 +61,12 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebelsWith
 			"rebels": map[string]interface{}{
 				"name": "Alliance to Restore the Republic",
 				"ships": map[string]interface{}{
-					"edges": []interface{}{
+					"items": []interface{}{
 						map[string]interface{}{
-							"cursor": "YXJyYXljb25uZWN0aW9uOjA=",
-							"node": map[string]interface{}{
-								"name": "X-Wing",
-							},
+							"name": "X-Wing",
 						},
 						map[string]interface{}{
-							"cursor": "YXJyYXljb25uZWN0aW9uOjE=",
-							"node": map[string]interface{}{
-								"name": "Y-Wing",
-							},
+							"name": "Y-Wing",
 						},
 					},
 				},
@@ -90,21 +77,17 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebelsWith
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
-func TestConnection_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWithACursor(t *testing.T) {
+
+func TestList_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWithACursor(t *testing.T) {
 	query := `
         query EndOfRebelShipsQuery {
           rebels {
             name,
             ships(first: 3 after: "YXJyYXljb25uZWN0aW9uOjE=") {
-              edges {
-                cursor,
-                node {
-                  name
-                }
+              items {
+                name
               }
             }
           }
@@ -115,24 +98,15 @@ func TestConnection_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWit
 			"rebels": map[string]interface{}{
 				"name": "Alliance to Restore the Republic",
 				"ships": map[string]interface{}{
-					"edges": []interface{}{
+					"items": []interface{}{
 						map[string]interface{}{
-							"cursor": "YXJyYXljb25uZWN0aW9uOjI=",
-							"node": map[string]interface{}{
-								"name": "A-Wing",
-							},
+							"name": "A-Wing",
 						},
 						map[string]interface{}{
-							"cursor": "YXJyYXljb25uZWN0aW9uOjM=",
-							"node": map[string]interface{}{
-								"name": "Millenium Falcon",
-							},
+							"name": "Millenium Falcon",
 						},
 						map[string]interface{}{
-							"cursor": "YXJyYXljb25uZWN0aW9uOjQ=",
-							"node": map[string]interface{}{
-								"name": "Home One",
-							},
+							"name": "Home One",
 						},
 					},
 				},
@@ -143,21 +117,17 @@ func TestConnection_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWit
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
-func TestConnection_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfTheConnection(t *testing.T) {
+
+func TestList_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfTheList(t *testing.T) {
 	query := `
         query RebelsQuery {
           rebels {
             name,
             ships(first: 3 after: "YXJyYXljb25uZWN0aW9uOjQ=") {
-              edges {
-                cursor,
-                node {
-                  name
-                }
+              items {
+                name
               }
             }
           }
@@ -168,7 +138,7 @@ func TestConnection_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfThe
 			"rebels": map[string]interface{}{
 				"name": "Alliance to Restore the Republic",
 				"ships": map[string]interface{}{
-					"edges": []interface{}{},
+					"items": []interface{}{},
 				},
 			},
 		},
@@ -177,30 +147,25 @@ func TestConnection_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfThe
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
-func TestConnection_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T) {
+
+func TestList_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T) {
 	query := `
         query EndOfRebelShipsQuery {
           rebels {
             name,
             originalShips: ships(first: 2) {
-              edges {
-                node {
-                  name
-                }
+              items {
+                name
               }
               pageInfo {
                 hasNextPage
               }
             }
             moreShips: ships(first: 3 after: "YXJyYXljb25uZWN0aW9uOjE=") {
-              edges {
-                node {
-                  name
-                }
+              items {
+                name
               }
               pageInfo {
                 hasNextPage
@@ -214,16 +179,12 @@ func TestConnection_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T
 			"rebels": map[string]interface{}{
 				"name": "Alliance to Restore the Republic",
 				"originalShips": map[string]interface{}{
-					"edges": []interface{}{
+					"items": []interface{}{
 						map[string]interface{}{
-							"node": map[string]interface{}{
-								"name": "X-Wing",
-							},
+							"name": "X-Wing",
 						},
 						map[string]interface{}{
-							"node": map[string]interface{}{
-								"name": "Y-Wing",
-							},
+							"name": "Y-Wing",
 						},
 					},
 					"pageInfo": map[string]interface{}{
@@ -231,21 +192,15 @@ func TestConnection_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T
 					},
 				},
 				"moreShips": map[string]interface{}{
-					"edges": []interface{}{
+					"items": []interface{}{
 						map[string]interface{}{
-							"node": map[string]interface{}{
-								"name": "A-Wing",
-							},
+							"name": "A-Wing",
 						},
 						map[string]interface{}{
-							"node": map[string]interface{}{
-								"name": "Millenium Falcon",
-							},
+							"name": "Millenium Falcon",
 						},
 						map[string]interface{}{
-							"node": map[string]interface{}{
-								"name": "Home One",
-							},
+							"name": "Home One",
 						},
 					},
 					"pageInfo": map[string]interface{}{
@@ -259,7 +214,5 @@ func TestConnection_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
-	}
+	assert.EqualValues(t, expected, result)
 }
